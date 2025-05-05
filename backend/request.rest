@@ -41,10 +41,9 @@ Content-Type: application/json
 
 {
     "user_id": 1,
-    "weight": 4.5,
-    "total_price": 45000
+    "weight": 2,
+    "total_price": 25000
 }
-
 
 
 ###
@@ -52,8 +51,8 @@ POST http://localhost:3000/add-payment
 Content-Type: application/json
 
 {
-    "order_id": "3",
+    "order_id": "6",
     "method": "Cash",
-    "amount": "45000",
+    "amount": "20000",
     "status": "1"
 }

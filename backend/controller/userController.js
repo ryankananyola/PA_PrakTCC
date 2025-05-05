@@ -91,5 +91,5 @@ export const deleteUser = async (req, res) => {
         }
     } catch (error) {
         console.log(error.message);
-    }
+    }                                   
 }

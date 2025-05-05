@@ -1,6 +1,43 @@
 import Payment from "../models/paymentModels.js";
 import Order from "../models/orderModels.js";
 
+// CREATE payment
+export const createPayment = async (req, res) => {
+    try {
+        const { order_id, method, amount, status, payment_date } = req.body;
+
+        const payment = await Payment.create({
+            order_id,
+            method,
+            amount,
+            status,
+            payment_date,
+        });
+    // Fungsi untuk memastikan status bernilai benar
+    const normalizeStatus = (val) => {
+        if (typeof val === "boolean") return val;
+        if (typeof val === "string") return val.toLowerCase() === "true" || val === "1";
+        if (typeof val === "number") return val === 1;
+        return false;
+    };
+
+    if (normalizeStatus(status)) {
+        const order = await Order.findByPk(order_id);
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        await order.update({ status: "Done" });
+    }
+
+
+        res.status(201).json({ msg: "Payment Created and Order Updated" });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ msg: "Error creating payment" });
+    }
+};
+
 // GET all payments
 export const getPayments = async (req, res) => {
     try {
@@ -29,36 +66,6 @@ export const getPaymentById = async (req, res) => {
         res.status(500).json({ msg: "Error retrieving payment" });
     }
 };
-
-// CREATE payment
-export const createPayment = async (req, res) => {
-    try {
-        const { order_id, method, amount, status, payment_date } = req.body;
-
-        // Buat pembayaran
-        const payment = await Payment.create({
-            order_id,
-            method,
-            amount,
-            status,
-            payment_date,
-        });
-
-        // Jika dibayar (status === true), ubah status order ke "Done"
-        if (status === true || status === 1) {
-            await Order.update(
-                { status: "Done" },
-                { where: { id: order_id } }
-            );
-        }
-
-        res.status(201).json({ msg: "Payment Created and Order Updated" });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ msg: "Error creating payment" });
-    }
-};
-
 
 // UPDATE payment
 export const updatePayment = async (req, res) => {
