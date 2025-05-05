@@ -32,3 +32,28 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3000/user/2
+
+
+###
+# Create Order
+POST http://localhost:3000/add-order
+Content-Type: application/json
+
+{
+    "user_id": 1,
+    "weight": 4.5,
+    "total_price": 45000
+}
+
+
+
+###
+POST http://localhost:3000/add-payment
+Content-Type: application/json
+
+{
+    "order_id": "3",
+    "method": "Cash",
+    "amount": "45000",
+    "status": "1"
+}
