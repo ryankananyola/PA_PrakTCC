@@ -13,8 +13,8 @@ export const createPayment = async (req, res) => {
             status,
             payment_date,
         });
-    // Fungsi untuk memastikan status bernilai benar
-    const normalizeStatus = (val) => {
+
+        const normalizeStatus = (val) => {
         if (typeof val === "boolean") return val;
         if (typeof val === "string") return val.toLowerCase() === "true" || val === "1";
         if (typeof val === "number") return val === 1;

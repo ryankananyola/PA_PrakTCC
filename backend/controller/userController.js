@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/userModels.js";
+import { Sequelize } from "sequelize";
 
 // GET
 async function getUsers(req, res) {
@@ -30,6 +31,7 @@ async function getUserById(req, res) {
 async function createUser(req, res) {
     try {
         const { name, email, password, noHP, role } = req.body;
+        // role = role || "user";
 
         // Hash the password
         const salt = await bcrypt.genSalt(10);
@@ -40,7 +42,11 @@ async function createUser(req, res) {
             email,
             password: hashedPassword,
             noHP,
-            role,
+            role: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                defaultValue: "user"
+            }            
         });
 
         res.status(201).json({ msg: "User Created" });

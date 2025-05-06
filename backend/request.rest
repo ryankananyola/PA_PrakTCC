@@ -51,7 +51,7 @@ POST http://localhost:3000/add-payment
 Content-Type: application/json
 
 {
-    "order_id": "6",
+    "order_id": "5",
     "method": "Cash",
     "amount": "20000",
     "status": "1"
