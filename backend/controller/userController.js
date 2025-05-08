@@ -131,7 +131,7 @@ export const loginUser = async (req, res) => {
         // Hapus password sebelum mengirim response
         delete user.password;
 
-        // Format response yang benar
+        // Format response yang benar, termasuk role
         res.status(200).json({
             status: "success",
             message: "Login berhasil",
@@ -140,7 +140,7 @@ export const loginUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 noHP: user.noHP,
-                role: user.role,
+                role: user.role, // Sertakan informasi role di response
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt
             }

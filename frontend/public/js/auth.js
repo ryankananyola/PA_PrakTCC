@@ -41,9 +41,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.status === "success") {
                     // Simpan data user (tanpa password)
                     localStorage.setItem('authUser', JSON.stringify(result.data));
-                    
-                    // Redirect ke dashboard
-                    window.location.href = 'index.html';
+                
+                    const userRole = result.data.role;
+                
+                    // Redirect berdasarkan role
+                    if (userRole === 'customer') {
+                        window.location.href = 'index.html';
+                    } else if (userRole === 'admin') {
+                        window.location.href = 'view/admin/dashboard-admin.html';
+                    } else {
+                        // Handle role yang tidak dikenal, mungkin arahkan ke halaman default
+                        console.warn('Role tidak dikenal:', userRole);
+                        window.location.href = 'index.html'; // Atau halaman default lainnya
+                    }
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan');
                 }

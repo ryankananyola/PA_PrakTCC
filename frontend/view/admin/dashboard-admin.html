@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Laundry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64 bg-blue-800 text-white">
+                <div class="flex items-center justify-center h-16 px-4 bg-blue-900">
+                    <span class="text-xl font-semibold">Admin Laundry</span>
+                </div>
+                <nav class="flex-1 px-4 py-4 space-y-2">
+                    <a href="#" class="flex items-center px-4 py-2 bg-blue-700 rounded-lg">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 hover:bg-blue-700 rounded-lg">
+                        <i class="fas fa-users mr-3"></i>
+                        Pelanggan
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 hover:bg-blue-700 rounded-lg">
+                        <i class="fas fa-box-open mr-3"></i>
+                        Pesanan
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 hover:bg-blue-700 rounded-lg">
+                        <i class="fas fa-chart-line mr-3"></i>
+                        Laporan
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 hover:bg-blue-700 rounded-lg">
+                        <i class="fas fa-cog mr-3"></i>
+                        Pengaturan
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-blue-700">
+                    <div class="flex items-center">
+                        <img class="w-10 h-10 rounded-full" src="https://via.placeholder.com/40" alt="Admin">
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">Admin</p>
+                            <p class="text-xs text-blue-200">admin@laundry.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center">
+                        <button class="md:hidden mr-4 text-gray-500">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <input type="text" placeholder="Cari pesanan..." class="px-4 py-2 border rounded-md">
+                        <button class="p-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                        <button id="logoutBtn" class="p-2 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Total Pesanan</p>
+                                <h3 class="text-2xl font-bold" id="total-orders">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Dalam Proses</p>
+                                <h3 class="text-2xl font-bold" id="processing-orders">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Selesai</p>
+                                <h3 class="text-2xl font-bold" id="completed-orders">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Pendapatan</p>
+                                <h3 class="text-2xl font-bold" id="total-revenue">Rp0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daftar Pesanan -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="flex items-center justify-between p-6 border-b">
+                        <h2 class="text-lg font-semibold">Daftar Pesanan Terbaru</h2>
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" id="add-order-btn">
+                            <i class="fas fa-plus mr-2"></i>Tambah Pesanan
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pesanan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat (kg)</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="orders-table-body">
+                                <!-- Data pesanan akan dimuat di sini -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            Menampilkan <span id="showing-from">1</span> sampai <span id="showing-to">10</span> dari <span id="total-items">0</span> pesanan
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 border rounded-md text-sm font-medium" id="prev-page" disabled>
+                                Sebelumnya
+                            </button>
+                            <button class="px-3 py-1 border rounded-md text-sm font-medium" id="next-page" disabled>
+                                Selanjutnya
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Ubah Status -->
+    <div id="status-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Ubah Status Pesanan</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Pilih Status</label>
+                <select id="status-select" class="w-full px-3 py-2 border rounded-md">
+                    <option value="Processing">Dalam Proses</option>
+                    <option value="Done">Selesai</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-update" class="px-4 py-2 border rounded-md">
+                    Batal
+                </button>
+                <button id="save-status" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const ordersTableBody = document.getElementById('orders-table-body');
+            const totalOrdersElement = document.getElementById('total-orders');
+            const processingOrdersElement = document.getElementById('processing-orders');
+            const completedOrdersElement = document.getElementById('completed-orders');
+            const totalRevenueElement = document.getElementById('total-revenue');
+            const prevPageBtn = document.getElementById('prev-page');
+            const nextPageBtn = document.getElementById('next-page');
+            const showingFromElement = document.getElementById('showing-from');
+            const showingToElement = document.getElementById('showing-to');
+            const totalItemsElement = document.getElementById('total-items');
+            const searchInput = document.querySelector('header input[type="text"]');
+            const addOrderBtn = document.getElementById('add-order-btn');
+            const statusModal = document.getElementById('status-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            const cancelUpdateBtn = document.getElementById('cancel-update');
+            const saveStatusBtn = document.getElementById('save-status');
+            const statusSelect = document.getElementById('status-select');
+
+            // Variabel state
+            let currentPage = 1;
+            const ordersPerPage = 10;
+            let allOrders = [];
+            let currentOrderId = null;
+
+            // Inisialisasi dashboard
+            fetchOrders();
+
+            // Event Listeners
+            prevPageBtn.addEventListener('click', goToPreviousPage);
+            nextPageBtn.addEventListener('click', goToNextPage);
+            searchInput.addEventListener('input', handleSearch);
+            addOrderBtn.addEventListener('click', handleAddOrder);
+            closeModalBtn.addEventListener('click', closeStatusModal);
+            cancelUpdateBtn.addEventListener('click', closeStatusModal);
+            saveStatusBtn.addEventListener('click', saveOrderStatus);
+
+            // Fungsi untuk mengambil data pesanan dari API
+            async function fetchOrders() {
+                try {
+                    const response = await fetch('http://localhost:3000/orders');
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data pesanan');
+                    }
+                    allOrders = await response.json();
+                    
+                    updateStatistics(allOrders);
+                    displayOrders(allOrders);
+                    updatePaginationInfo();
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Gagal memuat data pesanan. Silakan coba lagi.');
+                }
+            }
+
+            // Fungsi untuk memperbarui statistik
+            function updateStatistics(orders) {
+                const totalOrders = orders.length;
+                const processingOrders = orders.filter(order => order.status === 'Processing').length;
+                const completedOrders = orders.filter(order => order.status === 'Done').length;
+                const totalRevenue = orders.reduce((sum, order) => sum + parseFloat(order.total_price), 0);
+                
+                totalOrdersElement.textContent = totalOrders;
+                processingOrdersElement.textContent = processingOrders;
+                completedOrdersElement.textContent = completedOrders;
+                totalRevenueElement.textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
+            }
+
+            // Fungsi untuk menampilkan data pesanan di tabel
+            function displayOrders(orders) {
+                ordersTableBody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    ordersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                Tidak ada pesanan ditemukan
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${order.user ? order.user.name : 'Tidak ada data'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.weight} kg</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp${parseFloat(order.total_price).toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${order.status === 'Done' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                ${order.status === 'Done' ? 'Selesai' : 'Dalam Proses'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${new Date(order.created_at).toLocaleDateString('id-ID')}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 edit-order" data-id="${order.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900 delete-order" data-id="${order.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    ordersTableBody.appendChild(row);
+                });
+                
+                // Tambahkan event listener untuk tombol aksi
+                document.querySelectorAll('.edit-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = e.currentTarget.getAttribute('data-id');
+                        openStatusModal(orderId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-order').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const orderId = e.currentTarget.getAttribute('data-id');
+                        deleteOrder(orderId);
+                    });
+                });
+            }
+
+            // Fungsi untuk memperbarui info pagination
+            function updatePaginationInfo() {
+                const startIndex = (currentPage - 1) * ordersPerPage;
+                const endIndex = startIndex + ordersPerPage;
+                const paginatedOrders = allOrders.slice(startIndex, endIndex);
+                
+                showingFromElement.textContent = startIndex + 1;
+                showingToElement.textContent = Math.min(endIndex, allOrders.length);
+                totalItemsElement.textContent = allOrders.length;
+                
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = endIndex >= allOrders.length;
+                
+                displayOrders(paginatedOrders);
+            }
+
+            function goToPreviousPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePaginationInfo();
+                }
+            }
+
+            function goToNextPage() {
+                if ((currentPage * ordersPerPage) < allOrders.length) {
+                    currentPage++;
+                    updatePaginationInfo();
+                }
+            }
+
+            // Fungsi untuk pencarian
+            function handleSearch(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                if (searchTerm.length > 2) {
+                    const filteredOrders = allOrders.filter(order => 
+                        order.id.toString().includes(searchTerm) || 
+                        (order.user && order.user.name.toLowerCase().includes(searchTerm)) ||
+                        order.status.toLowerCase().includes(searchTerm)
+                    );
+                    displayOrders(filteredOrders);
+                } else if (searchTerm === '') {
+                    updatePaginationInfo();
+                }
+            }
+
+            function handleAddOrder() {
+                alert('Membuka form tambah pesanan baru');
+                // Di aplikasi nyata: window.location.href = '/orders/create';
+            }
+
+            function openStatusModal(orderId) {
+                currentOrderId = orderId;
+                const order = allOrders.find(o => o.id == orderId);
+                if (order) {
+                    statusSelect.value = order.status;
+                }
+                statusModal.classList.remove('hidden');
+            }
+
+            function closeStatusModal() {
+                statusModal.classList.add('hidden');
+                currentOrderId = null;
+            }
+
+            // Fungsi untuk menyimpan perubahan status
+            async function saveOrderStatus() {
+                if (!currentOrderId) return;
+                
+                try {
+                    const response = await fetch(`http://localhost:3000/orders/${currentOrderId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: statusSelect.value
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Gagal memperbarui status pesanan');
+                    }
+                    
+                    closeStatusModal();
+                    fetchOrders(); // Refresh data
+                    alert('Status pesanan berhasil diperbarui');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Gagal memperbarui status. Silakan coba lagi.');
+                }
+            }
+
+            // Fungsi untuk menghapus pesanan
+            async function deleteOrder(orderId) {
+                if (!confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`http://localhost:3000/orders/${orderId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Gagal menghapus pesanan');
+                    }
+                    
+                    fetchOrders(); // Refresh data
+                    alert('Pesanan berhasil dihapus');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Gagal menghapus pesanan. Silakan coba lagi.');
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>

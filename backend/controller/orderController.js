@@ -1,10 +1,11 @@
+// orderController.js
 import Order from "../models/orderModels.js";
 
 // CREATE ORDER
 export const createOrder = async (req, res) => {
     try {
         const { user_id, weight, total_price } = req.body;
-
+        
         const order = await Order.create({
             user_id,
             weight,
@@ -12,12 +13,16 @@ export const createOrder = async (req, res) => {
         });
         
         res.status(201).json({ 
-            message: "Order created successfully",
+            status: "success",
+            message: "Pesanan berhasil dibuat",
             data: order
         });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ 
+            status: "error",
+            message: "Terjadi kesalahan server"
+        });
     }
 };
 
@@ -25,12 +30,20 @@ export const createOrder = async (req, res) => {
 export const getOrders = async (req, res) => {
     try {
         const orders = await Order.findAll({
-            include: ['user']
+            include: ['user'],
+            order: [['created_at', 'DESC']] // Urutkan dari yang terbaru
         });
-        res.status(200).json(orders);
+        
+        res.status(200).json({
+            status: "success",
+            data: orders
+        });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ 
+            status: "error",
+            message: "Gagal mengambil data pesanan"
+        });
     }
 };
 
@@ -43,38 +56,56 @@ export const getOrderById = async (req, res) => {
         });
         
         if (!order) {
-            return res.status(404).json({ message: "Order not found" });
+            return res.status(404).json({ 
+                status: "error",
+                message: "Pesanan tidak ditemukan"
+            });
         }
         
-        res.status(200).json(order);
+        res.status(200).json({
+            status: "success",
+            data: order
+        });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ 
+            status: "error",
+            message: "Terjadi kesalahan server"
+        });
     }
 };
 
 // UPDATE ORDER
 export const updateOrder = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { weight, total_price, status } = req.body;
         
         const [updated] = await Order.update(
-            { status },
+            { weight, total_price, status },
             { where: { id: req.params.id } }
         );
         
         if (updated) {
-            const updatedOrder = await Order.findByPk(req.params.id);
+            const updatedOrder = await Order.findByPk(req.params.id, {
+                include: ['user']
+            });
             return res.status(200).json({
-                message: "Order updated successfully",
+                status: "success",
+                message: "Pesanan berhasil diperbarui",
                 data: updatedOrder
             });
         }
         
-        return res.status(404).json({ message: "Order not found" });
+        return res.status(404).json({ 
+            status: "error",
+            message: "Pesanan tidak ditemukan"
+        });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ 
+            status: "error",
+            message: "Terjadi kesalahan server"
+        });
     }
 };
 
@@ -86,12 +117,21 @@ export const deleteOrder = async (req, res) => {
         });
         
         if (deleted) {
-            return res.status(200).json({ message: "Order deleted successfully" });
+            return res.status(200).json({ 
+                status: "success",
+                message: "Pesanan berhasil dihapus"
+            });
         }
         
-        return res.status(404).json({ message: "Order not found" });
+        return res.status(404).json({ 
+            status: "error",
+            message: "Pesanan tidak ditemukan"
+        });
     } catch (error) {
         console.error(error.message);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ 
+            status: "error",
+            message: "Terjadi kesalahan server"
+        });
     }
 };
