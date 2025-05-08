@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LaundryRR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div id="app">
+        <!-- Konten akan dimuat oleh JavaScript -->
+        <div class="flex justify-center items-center h-screen">
+            <p class="text-lg">Memuat dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loader" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Edit Order Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Edit Pesanan</h3>
+                <button onclick="document.getElementById('edit-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="edit-order-form">
+                <input type="hidden" id="edit-order-id">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Berat (kg)</label>
+                    <input type="number" id="edit-weight" class="w-full px-3 py-2 border rounded-md" step="0.1" min="0" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Total Harga</label>
+                    <input type="number" id="edit-price" class="w-full px-3 py-2 border rounded-md" min="0" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Status</label>
+                    <select id="edit-status" class="w-full px-3 py-2 border rounded-md" required>
+                        <option value="Processing">Proses</option>
+                        <option value="Done">Selesai</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')" class="px-4 py-2 border rounded-md">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div id="error-alert" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden" role="alert"></div>
+    <div id="success-alert" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden" role="alert"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek session user
+            checkAuth();
+            
+            // Load data orders
+            loadOrders();
+            
+            // Event listeners
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'logoutBtn') {
+                    logout();
+                }
+                if (e.target.classList.contains('edit-btn')) {
+                    const orderId = e.target.closest('button').getAttribute('data-id');
+                    editOrder(orderId);
+                }
+                if (e.target.classList.contains('delete-btn')) {
+                    const orderId = e.target.closest('button').getAttribute('data-id');
+                    confirmDelete(orderId);
+                }
+            });
+            
+            document.getElementById('search-input')?.addEventListener('input', handleSearch);
+            document.getElementById('edit-order-form')?.addEventListener('submit', handleEditOrder);
+        });
+
+        function checkAuth() {
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            if (!authUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            renderDashboard(authUser);
+        }
+
+        function renderDashboard(user) {
+            const app = document.getElementById('app');
+            
+            app.innerHTML = `
+                <nav class="bg-blue-600 text-white p-4">
+                    <div class="container mx-auto flex justify-between">
+                        <h1 class="text-xl font-bold">Dashboard LaundryRR</h1>
+                        <div class="flex items-center space-x-4">
+                            <span>Halo, ${user.name} (${user.role})</span>
+                            <button id="logoutBtn" class="bg-red-500 px-4 py-1 rounded">
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+                
+                <main class="container mx-auto p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Total Pesanan</p>
+                                    <h3 class="text-2xl font-bold" id="total-orders">0</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Dalam Proses</p>
+                                    <h3 class="text-2xl font-bold" id="processing-orders">0</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-spinner"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Selesai</p>
+                                    <h3 class="text-2xl font-bold" id="completed-orders">0</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500">Pendapatan</p>
+                                    <h3 class="text-2xl font-bold" id="total-revenue">Rp0</h3>
+                                </div>
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="flex items-center justify-between p-6 border-b">
+                            <h2 class="text-lg font-semibold">Daftar Pesanan</h2>
+                            <div class="relative">
+                                <input type="text" id="search-input" placeholder="Cari pesanan..." 
+                                    class="px-4 py-2 border rounded-md pl-10">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="orders-table-body">
+                                    <!-- Data akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </main>
+            `;
+        }
+
+        async function loadOrders() {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/orders`);
+                if (!response.ok) {
+                    throw new Error('Gagal memuat data pesanan');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal memuat data pesanan');
+                }
+                
+                displayOrders(data.data);
+                updateStatistics(data.data);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayOrders(orders) {
+            const tbody = document.getElementById('orders-table-body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">Tidak ada data pesanan</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            orders.forEach(order => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${order.user ? order.user.name : 'Tidak ada data'}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.weight} kg</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price.toLocaleString('id-ID')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 rounded-full text-xs ${
+                            order.status === 'Done' 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-yellow-100 text-yellow-800'
+                        }">
+                            ${order.status === 'Done' ? 'Selesai' : 'Proses'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        ${new Date(order.created_at).toLocaleDateString('id-ID')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="edit-btn text-blue-600 hover:text-blue-900 mr-3" 
+                            data-id="${order.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn text-red-600 hover:text-red-900" 
+                            data-id="${order.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStatistics(orders) {
+            const totalOrders = orders.length;
+            const processingOrders = orders.filter(o => o.status === 'Processing').length;
+            const completedOrders = orders.filter(o => o.status === 'Done').length;
+            const totalRevenue = orders.reduce((sum, order) => sum + order.total_price, 0);
+            
+            document.getElementById('total-orders').textContent = totalOrders;
+            document.getElementById('processing-orders').textContent = processingOrders;
+            document.getElementById('completed-orders').textContent = completedOrders;
+            document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
+        }
+
+        async function editOrder(orderId) {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data pesanan');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal mengambil data pesanan');
+                }
+                
+                showEditModal(data.data);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showEditModal(order) {
+            const modal = document.getElementById('edit-modal');
+            document.getElementById('edit-order-id').value = order.id;
+            document.getElementById('edit-weight').value = order.weight;
+            document.getElementById('edit-price').value = order.total_price;
+            document.getElementById('edit-status').value = order.status;
+            
+            modal.classList.remove('hidden');
+        }
+
+        async function handleEditOrder(e) {
+            e.preventDefault();
+            
+            const orderId = document.getElementById('edit-order-id').value;
+            const weight = document.getElementById('edit-weight').value;
+            const price = document.getElementById('edit-price').value;
+            const status = document.getElementById('edit-status').value;
+            
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        weight: parseFloat(weight),
+                        total_price: parseFloat(price),
+                        status
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Gagal memperbarui pesanan');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal memperbarui pesanan');
+                }
+                
+                document.getElementById('edit-modal').classList.add('hidden');
+                loadOrders();
+                showSuccess('Pesanan berhasil diperbarui');
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function confirmDelete(orderId) {
+            if (confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
+                deleteOrder(orderId);
+            }
+        }
+
+        async function deleteOrder(orderId) {
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Gagal menghapus pesanan');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal menghapus pesanan');
+                }
+                
+                loadOrders();
+                showSuccess('Pesanan berhasil dihapus');
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#orders-table-body tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('authUser');
+            window.location.href = 'login.html';
+        }
+
+        function showLoading(show) {
+            const loader = document.getElementById('loader');
+            if (!loader) return;
+            
+            if (show) {
+                loader.classList.remove('hidden');
+            } else {
+                loader.classList.add('hidden');
+            }
+        }
+
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            if (!errorAlert) return;
+            
+            errorAlert.textContent = message;
+            errorAlert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorAlert.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('success-alert');
+            if (!successAlert) return;
+            
+            successAlert.textContent = message;
+            successAlert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                successAlert.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

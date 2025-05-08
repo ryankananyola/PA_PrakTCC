@@ -66,7 +66,7 @@ Content-Type: application/json
     "email": "aryamuktisatria@gmail.com",
     "password": "iniPassSaya2",
     "noHP": "00123220198",
-    "role": "customer"
+    "role": "user"
 }
 
 ###

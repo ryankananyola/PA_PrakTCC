@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                     // Redirect berdasarkan role
                     if (userRole === 'customer') {
-                        window.location.href = 'index.html';
+                        window.location.href = 'customer/dashboard-customer.html';
                     } else if (userRole === 'admin') {
-                        window.location.href = 'view/admin/dashboard-admin.html';
+                        window.location.href = 'admin/dashboard-admin.html';
                     } else {
                         // Handle role yang tidak dikenal, mungkin arahkan ke halaman default
                         console.warn('Role tidak dikenal:', userRole);
