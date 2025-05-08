@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #001aff;
-    --secondary-color: #1900ff;
+    --primary-color: #2563eb;
+    --secondary-color: #2563eb;
     --text-color: #333;
     --light-color: #ffffff;
     --bg-color: #f9f9f9;
@@ -129,7 +129,7 @@ header {
 }
 
 .hero-image {
-    width: 35%;
+    width: 30%;
     position: relative;
 }
 

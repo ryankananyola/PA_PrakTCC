@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (userRole === 'admin') {
                         window.location.href = 'admin/dashboard-admin.html';
                     } else {
-                        // Handle role yang tidak dikenal, mungkin arahkan ke halaman default
                         console.warn('Role tidak dikenal:', userRole);
                         window.location.href = 'index.html'; // Atau halaman default lainnya
                     }
