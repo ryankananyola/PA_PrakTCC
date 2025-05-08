@@ -5,9 +5,9 @@ POST http://localhost:3000/add-users
 Content-Type: application/json
 
 {
-    "name": "Ryan 2",
-    "email": "ryanKN@gmail.com",
-    "password": "iniPassSaya2",
+    "name": "user",
+    "email": "user@gmail.com",
+    "password": "user123",
     "noHP": "00123220198",
     "role": "user"
 }
@@ -51,8 +51,32 @@ POST http://localhost:3000/add-payment
 Content-Type: application/json
 
 {
-    "order_id": "5",
+    "order_id": "1",
     "method": "Cash",
     "amount": "20000",
     "status": "1"
 }
+
+###
+POST http://localhost:3000/add-users
+Content-Type: application/json
+
+{
+    "name": "Rio",
+    "email": "aryamuktisatria@gmail.com",
+    "password": "iniPassSaya2",
+    "noHP": "00123220198",
+    "role": "user"
+}
+
+###
+POST http://localhost:3000/add-users
+Content-Type: application/json
+{
+  "name": "Admin",
+  "email": "admin@laundry.com",
+  "password": "password123",
+  "noHP": "08123456789",
+  "role": "admin"
+}
+###

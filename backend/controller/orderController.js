@@ -4,7 +4,7 @@ import Order from "../models/orderModels.js";
 export const createOrder = async (req, res) => {
     try {
         const { user_id, weight, total_price } = req.body;
-        
+
         const order = await Order.create({
             user_id,
             weight,

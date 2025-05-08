@@ -1,0 +1,10 @@
+/* Custom styles can go here */
+.hidden {
+    display: none;
+  }
+  
+  #userModal {
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Add any additional custom styles */
