@@ -2,72 +2,17 @@ const API_BASE_URL = 'http://localhost:3000';
 
 // Fungsi utama setelah DOM siap
 document.addEventListener('DOMContentLoaded', function() {
+    checkExistingSession();
+    
     const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
     
     if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('errorMsg');
-
-            // Validasi input
-            if (!email || !password) {
-                showError("Email dan password harus diisi", errorMsg);
-                return;
-            }
-
-            // Tampilkan loading
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = 'Memproses...';
-
-            try {
-                const response = await fetch('http://localhost:3000/users/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'Login gagal');
-                }
-
-                if (result.status === "success") {
-                    // Simpan data user (tanpa password)
-                    localStorage.setItem('authUser', JSON.stringify(result.data));
-                
-                    const userRole = result.data.role;
-                
-                    // Redirect berdasarkan role
-                    if (userRole === 'customer') {
-                        window.location.href = 'customer/dashboard-customer.html';
-                         } else if (userRole === 'admin') {
-                         window.location.href = 'admin/dashboard-admin.html';
-                        } else {
-                        // Handle role yang tidak dikenal, mungkin arahkan ke halaman default
-                        console.warn('Role tidak dikenal:', userRole);
-                        window.location.href = 'index.html'; // Atau halaman default lainnya
-                    }
-                } else {
-                    throw new Error(result.message || 'Terjadi kesalahan');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                showError(error.message, errorMsg);
-            } finally {
-                // Reset button
-                if (loginBtn) {
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = 'Login';
-                }
-            }
-        });
+        loginForm.addEventListener('submit', handleLoginSubmit);
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegisterSubmit);
     }
 });
 
@@ -75,7 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkExistingSession() {
     const authUser = localStorage.getItem('authUser');
     if (authUser) {
-        window.location.href = 'index.html';
+        const userData = JSON.parse(authUser);
+        redirectBasedOnRole(userData.role);
     }
 }
 
@@ -108,6 +54,68 @@ async function handleLoginSubmit(event) {
     } finally {
         // Reset loading state
         setLoadingState(false, loginBtn);
+    }
+}
+
+// Fungsi untuk menangani registrasi
+async function handleRegisterSubmit(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const registerBtn = document.getElementById('registerBtn');
+    const errorMsg = document.getElementById('errorMsg');
+
+    // Validasi input
+    if (!name || !email || !phone || !password || !confirmPassword) {
+        showError("Semua field harus diisi", errorMsg);
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        showError("Password dan konfirmasi password tidak sama", errorMsg);
+        return;
+    }
+
+    // Tampilkan loading
+    registerBtn.disabled = true;
+    document.getElementById('registerText').classList.add('hidden');
+    document.getElementById('registerSpinner').classList.remove('hidden');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                password,
+                confirmPassword,
+                noHP: phone
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Registrasi gagal');
+        }
+
+        // Redirect to login with success message
+        window.location.href = 'login.html?registered=true';
+
+    } catch (error) {
+        console.error('Registration error:', error);
+        showError(error.message, errorMsg);
+    } finally {
+        registerBtn.disabled = false;
+        document.getElementById('registerText').classList.remove('hidden');
+        document.getElementById('registerSpinner').classList.add('hidden');
     }
 }
 
@@ -202,8 +210,20 @@ function handleSuccessfulLogin(userData) {
         role: userData.role
     }));
     
-    // Redirect ke halaman utama
-    window.location.href = 'index.html';
+    // Redirect berdasarkan role
+    redirectBasedOnRole(userData.role);
+}
+
+// Fungsi untuk redirect berdasarkan role
+function redirectBasedOnRole(role) {
+    if (role === 'customer') {
+        window.location.href = 'customer/dashboard-customer.html';
+    } else if (role === 'admin') {
+        window.location.href = 'admin/dashboard-admin.html';
+    } else {
+        console.warn('Role tidak dikenal:', role);
+        window.location.href = 'index.html';
+    }
 }
 
 // Fungsi untuk menangani error login
@@ -219,55 +239,3 @@ function handleLoginError(error, errorElement) {
     
     showError(errorMessage, errorElement);
 }
-
-// Add this to your existing auth.js
-document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const registerBtn = document.getElementById('registerBtn');
-    const errorMsg = document.getElementById('errorMsg');
-
-    // Show loading
-    registerBtn.disabled = true;
-    document.getElementById('registerText').classList.add('hidden');
-    document.getElementById('registerSpinner').classList.remove('hidden');
-
-    try {
-        const response = await fetch('http://localhost:3000/users/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name,
-                email,
-                password,
-                confirmPassword,
-                noHP: phone
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Registrasi gagal');
-        }
-
-        // Redirect to login with success message
-        window.location.href = 'login.html?registered=true';
-
-    } catch (error) {
-        console.error('Registration error:', error);
-        errorMsg.querySelector('#errorText').textContent = error.message;
-        errorMsg.classList.remove('hidden');
-    } finally {
-        registerBtn.disabled = false;
-        document.getElementById('registerText').classList.remove('hidden');
-        document.getElementById('registerSpinner').classList.add('hidden');
-    }
-});

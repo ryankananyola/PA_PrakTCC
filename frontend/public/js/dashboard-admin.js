@@ -55,21 +55,22 @@ function checkAuth() {
 async function loadOrders() {
     try {
         showLoading(true);
-        
+
         const response = await fetch(`${API_BASE_URL}/orders`);
         if (!response.ok) {
             throw new Error('Gagal memuat data pesanan');
         }
-        
+
         const data = await response.json();
-        
+        console.log(data); // Menampilkan data di console untuk debugging
+
         if (data.status !== "success") {
             throw new Error(data.message || 'Gagal memuat data pesanan');
         }
-        
+
         displayOrders(data.data);
         updateStatistics(data.data);
-        
+
     } catch (error) {
         showError(error.message);
     } finally {
@@ -77,71 +78,43 @@ async function loadOrders() {
     }
 }
 
+
 // Fungsi untuk menampilkan data pesanan di tabel
 function displayOrders(orders) {
     const tbody = document.getElementById('orders-table-body');
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    
-    if (orders.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center py-4">Tidak ada data pesanan</td>
-            </tr>
-        `;
+    if (!tbody) {
+        console.log('Tbody tidak ditemukan');
         return;
     }
-    
-    orders.forEach(order => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50';
-        tr.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
+
+    console.log('Data Pesanan:', orders);  // Cek apakah data pesanan sudah sampai
+
+    tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
+
+    if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Tidak ada data pesanan</td></tr>`;
+        return;
+    }
+
+    orderList.forEach((order, index) => {
+        tableBody.innerHTML += `
+            <tr class="bg-white border-b">
+            <td class="px-6 py-4 whitespace-nowrap">${index + 1}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${order.customerName ?? 'Tidak ada data'}</td>
+            <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
+            <td class="px-6 py-4 whitespace-nowrap">Rp${order.totalPrice?.toLocaleString('id-ID') ?? '0'}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                ${order.user ? order.user.name : 'Tidak ada data'}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">${order.weight} kg</td>
-            <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price.toLocaleString('id-ID')}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 rounded-full text-xs ${
-                    order.status === 'Done' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                }">
-                    ${order.status === 'Done' ? 'Selesai' : 'Proses'}
+                <span class="inline-block px-2 py-1 text-xs font-semibold ${order.status === 'Processing' ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'} rounded-full">
+                ${order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
                 </span>
             </td>
+            <td class="px-6 py-4 whitespace-nowrap">${order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID') : '-'}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                ${new Date(order.created_at).toLocaleDateString('id-ID')}
+                <a href="#" class="text-blue-500 hover:text-blue-700"><i class="fas fa-edit"></i></a>
+                <a href="#" class="text-red-500 hover:text-red-700 ml-2"><i class="fas fa-trash-alt"></i></a>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-                <button class="edit-btn text-blue-600 hover:text-blue-900 mr-3" 
-                    data-id="${order.id}">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="delete-btn text-red-600 hover:text-red-900" 
-                    data-id="${order.id}">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
+            </tr>
         `;
-        tbody.appendChild(tr);
-    });
-    
-    // Tambahkan event listener untuk tombol aksi
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const orderId = e.currentTarget.getAttribute('data-id');
-            editOrder(orderId);
-        });
-    });
-    
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const orderId = e.currentTarget.getAttribute('data-id');
-            confirmDelete(orderId);
-        });
     });
 }
 

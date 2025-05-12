@@ -218,7 +218,7 @@
             let currentPage = 1;
             const ordersPerPage = 10;
             let allOrders = [];
-            let currentOrderId = null;
+            let filteredOrders = [];
 
             // Inisialisasi dashboard
             fetchOrders();
@@ -235,18 +235,15 @@
             // Fungsi untuk mengambil data pesanan dari API
             async function fetchOrders() {
                 try {
-                    const response = await fetch('http://localhost:3000/orders');
-                    if (!response.ok) {
-                        throw new Error('Gagal mengambil data pesanan');
-                    }
+                    const response = await fetch('http://localhost:3000/orders/');
+                    if (!response.ok) throw new Error('Gagal mengambil data pesanan');
+
                     allOrders = await response.json();
-                    
+                    filteredOrders = [...allOrders]; // inisialisasi data terfilter
                     updateStatistics(allOrders);
-                    displayOrders(allOrders);
                     updatePaginationInfo();
-                    
+
                 } catch (error) {
-                    console.error('Error:', error);
                     alert('Gagal memuat data pesanan. Silakan coba lagi.');
                 }
             }
@@ -329,17 +326,18 @@
             function updatePaginationInfo() {
                 const startIndex = (currentPage - 1) * ordersPerPage;
                 const endIndex = startIndex + ordersPerPage;
-                const paginatedOrders = allOrders.slice(startIndex, endIndex);
-                
-                showingFromElement.textContent = startIndex + 1;
-                showingToElement.textContent = Math.min(endIndex, allOrders.length);
-                totalItemsElement.textContent = allOrders.length;
-                
+                const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
+
+                showingFromElement.textContent = filteredOrders.length === 0 ? 0 : startIndex + 1;
+                showingToElement.textContent = Math.min(endIndex, filteredOrders.length);
+                totalItemsElement.textContent = filteredOrders.length;
+
                 prevPageBtn.disabled = currentPage === 1;
-                nextPageBtn.disabled = endIndex >= allOrders.length;
-                
+                nextPageBtn.disabled = endIndex >= filteredOrders.length;
+
                 displayOrders(paginatedOrders);
             }
+
 
             function goToPreviousPage() {
                 if (currentPage > 1) {
@@ -358,18 +356,21 @@
             // Fungsi untuk pencarian
             function handleSearch(e) {
                 const searchTerm = e.target.value.toLowerCase();
-                
+
                 if (searchTerm.length > 2) {
-                    const filteredOrders = allOrders.filter(order => 
-                        order.id.toString().includes(searchTerm) || 
+                    filteredOrders = allOrders.filter(order =>
+                        order.id.toString().includes(searchTerm) ||
                         (order.user && order.user.name.toLowerCase().includes(searchTerm)) ||
                         order.status.toLowerCase().includes(searchTerm)
                     );
-                    displayOrders(filteredOrders);
-                } else if (searchTerm === '') {
-                    updatePaginationInfo();
+                } else {
+                    filteredOrders = [...allOrders];
                 }
+
+                currentPage = 1; // reset ke halaman pertama
+                updatePaginationInfo();
             }
+
 
             function handleAddOrder() {
                 alert('Membuka form tambah pesanan baru');
