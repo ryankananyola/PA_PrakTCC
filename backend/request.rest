@@ -72,10 +72,11 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/add-users
 Content-Type: application/json
+
 {
   "name": "Admin",
-  "email": "admin@laundry.com",
-  "password": "password123",
+  "email": "admin1@gmail.com",
+  "password": "admin1234",
   "noHP": "08123456789",
   "role": "admin"
 }

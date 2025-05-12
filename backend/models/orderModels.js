@@ -25,7 +25,7 @@ const Order = db.define("order", {
     },
 });
 
-User.hasMany(Order, { foreignKey: "user_id" });
-Order.belongsTo(User, { foreignKey: "user_id" });
+User.hasMany(Order, { foreignKey: "user_id", as: "orders" });
+Order.belongsTo(User, { foreignKey: "user_id", as: "user" }); 
 
 export default Order;

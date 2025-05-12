@@ -1,39 +1,22 @@
 // orderController.js
 import Order from "../models/orderModels.js";
-
-// CREATE ORDER
-export const createOrder = async (req, res) => {
-    try {
-        const { user_id, weight, total_price } = req.body;
-        
-        const order = await Order.create({
-            user_id,
-            weight,
-            total_price
-        });
-        
-        res.status(201).json({ 
-            status: "success",
-            message: "Pesanan berhasil dibuat",
-            data: order
-        });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ 
-            status: "error",
-            message: "Terjadi kesalahan server"
-        });
-    }
-};
+import User from "../models/userModels.js"; // pastikan impor ini ada
 
 // GET ALL ORDERS
 export const getOrders = async (req, res) => {
     try {
         const orders = await Order.findAll({
-            include: ['user'],
-            order: [['created_at', 'DESC']] // Urutkan dari yang terbaru
+            include: [
+                {
+                model: User,
+                as: "user", // <-- tambahkan ini
+                attributes: ["name"]
+                }
+            ],
+            order: [["created_at", "DESC"]]
         });
-        
+
+
         res.status(200).json({
             status: "success",
             data: orders
@@ -46,6 +29,7 @@ export const getOrders = async (req, res) => {
         });
     }
 };
+
 
 // GET ORDER BY ID
 export const getOrderById = async (req, res) => {
@@ -64,6 +48,31 @@ export const getOrderById = async (req, res) => {
         
         res.status(200).json({
             status: "success",
+            data: order
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ 
+            status: "error",
+            message: "Terjadi kesalahan server"
+        });
+    }
+};
+
+// CREATE ORDER
+export const createOrder = async (req, res) => {
+    try {
+        const { user_id, weight, total_price } = req.body;
+        
+        const order = await Order.create({
+            user_id,
+            weight,
+            total_price
+        });
+        
+        res.status(201).json({ 
+            status: "success",
+            message: "Pesanan berhasil dibuat",
             data: order
         });
     } catch (error) {

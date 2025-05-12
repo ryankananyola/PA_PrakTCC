@@ -46,10 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                     // Redirect berdasarkan role
                     if (userRole === 'customer') {
-                                                window.location.href = 'customer/dashboard-customer.html';
-                                            } else if (userRole === 'admin') {
-                                                window.location.href = 'admin/dashboard-admin.html';
-                                            } else {
+                        window.location.href = 'customer/dashboard-customer.html';
+                    } else if (userRole === 'admin') {
+                        window.location.href = 'admin/dashboard-admin.html';
+                    } else {
                         // Handle role yang tidak dikenal, mungkin arahkan ke halaman default
                         console.warn('Role tidak dikenal:', userRole);
                         window.location.href = 'index.html'; // Atau halaman default lainnya
