@@ -104,3 +104,14 @@ export const deletePayment = async (req, res) => {
         res.status(500).json({ msg: "Error deleting payment" });
     }
 };
+export const getPaymentsByOrderId = async (req, res) => {
+    try {
+        const payments = await Payment.findAll({
+            where: { order_id: req.params.orderId }, // Asumsi parameter route adalah orderId
+        });
+        res.status(200).json(payments);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ msg: "Error retrieving payments by order ID" });
+    }
+};

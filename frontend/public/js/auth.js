@@ -2,33 +2,22 @@ const API_BASE_URL = 'http://localhost:3000';
 
 // Fungsi utama setelah DOM siap
 document.addEventListener('DOMContentLoaded', function() {
-    checkExistingSession();
-    
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    
+
     if (loginForm) {
         loginForm.addEventListener('submit', handleLoginSubmit);
     }
-    
+
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegisterSubmit);
     }
 });
 
-// Fungsi untuk mengecek session yang sudah ada
-function checkExistingSession() {
-    const authUser = localStorage.getItem('authUser');
-    if (authUser) {
-        const userData = JSON.parse(authUser);
-        redirectBasedOnRole(userData.role);
-    }
-}
-
 // Fungsi untuk menangani submit login
 async function handleLoginSubmit(event) {
     event.preventDefault();
-    
+
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const loginBtn = document.getElementById('loginBtn');
@@ -43,7 +32,7 @@ async function handleLoginSubmit(event) {
     try {
         // Proses login
         const loginResult = await processLogin(email, password);
-        
+
         if (loginResult.success) {
             handleSuccessfulLogin(loginResult.data);
         } else {
@@ -60,7 +49,7 @@ async function handleLoginSubmit(event) {
 // Fungsi untuk menangani registrasi
 async function handleRegisterSubmit(event) {
     event.preventDefault();
-    
+
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const phone = document.getElementById('phone').value;
@@ -125,12 +114,12 @@ function validateInputs(email, password, errorElement) {
         showError("Email dan password harus diisi", errorElement);
         return false;
     }
-    
+
     if (!validateEmail(email)) {
         showError("Format email tidak valid", errorElement);
         return false;
     }
-    
+
     return true;
 }
 
@@ -145,7 +134,7 @@ function showError(message, errorElement) {
     if (errorElement) {
         errorElement.textContent = message;
         errorElement.classList.remove('hidden');
-        
+
         setTimeout(() => {
             errorElement.classList.add('hidden');
         }, 5000);
@@ -178,7 +167,7 @@ async function processLogin(email, password) {
         });
 
         const result = await response.json();
-        
+
         if (!response.ok) {
             return {
                 success: false,
@@ -209,33 +198,21 @@ function handleSuccessfulLogin(userData) {
         phone: userData.noHP || userData.phone,
         role: userData.role
     }));
-    
+
     // Redirect berdasarkan role
     redirectBasedOnRole(userData.role);
-}
-
-// Fungsi untuk redirect berdasarkan role
-function redirectBasedOnRole(role) {
-    if (role === 'customer') {
-        window.location.href = 'customer/dashboard-customer.html';
-    } else if (role === 'admin') {
-        window.location.href = 'admin/dashboard-admin.html';
-    } else {
-        console.warn('Role tidak dikenal:', role);
-        window.location.href = 'index.html';
-    }
 }
 
 // Fungsi untuk menangani error login
 function handleLoginError(error, errorElement) {
     console.error('Login error:', error);
-    
+
     let errorMessage = 'Terjadi kesalahan saat login';
     if (error.message) {
         errorMessage = error.message;
     } else if (error instanceof TypeError) {
         errorMessage = 'Koneksi ke server gagal';
     }
-    
+
     showError(errorMessage, errorElement);
 }

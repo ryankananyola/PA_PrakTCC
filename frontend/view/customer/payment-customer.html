@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - LaundryRR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .payment-method {
+            transition: all 0.3s ease;
+        }
+        .payment-method:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .payment-method.selected {
+            border-color: #6C63FF;
+            background-color: #f0f0ff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <a href="dashboard-customer.html" class="flex items-center space-x-2">
+                    <img src="../assets/image/logo.jpg" alt="Laundry RR Logo" class="h-10 rounded-full">
+                    <span class="text-xl font-bold text-purple-600">Laundry RR</span>
+                </a>
+                <div>
+                    <a href="dashboard-customer.html" class="text-gray-600 hover:text-purple-600">
+                        <i class="fas fa-arrow-left mr-1"></i> Kembali ke Dashboard
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-3xl mx-auto">
+                <!-- Payment Header -->
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Pembayaran Laundry</h1>
+                    <p class="text-gray-600">Lakukan pembayaran untuk pesanan laundry Anda</p>
+                </div>
+
+                <!-- Payment Steps -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                    <div class="p-6">
+                        <div class="flex justify-between mb-6">
+                            <div class="step flex-1 text-center">
+                                <div class="w-10 h-10 mx-auto rounded-full bg-purple-600 text-white flex items-center justify-center mb-2">1</div>
+                                <p class="text-sm font-medium">Pilih Metode</p>
+                            </div>
+                            <div class="step flex-1 text-center">
+                                <div class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-600 flex items-center justify-center mb-2">2</div>
+                                <p class="text-sm text-gray-500">Konfirmasi</p>
+                            </div>
+                            <div class="step flex-1 text-center">
+                                <div class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-600 flex items-center justify-center mb-2">3</div>
+                                <p class="text-sm text-gray-500">Selesai</p>
+                            </div>
+                        </div>
+
+                        <!-- Payment Form -->
+                        <form id="paymentForm" class="space-y-6">
+                            <input type="hidden" id="orderId" value="">
+                            
+                            <!-- Order Selection -->
+                            <div id="orderSelectionSection">
+                                <h3 class="text-lg font-semibold mb-4">Pilih Pesanan</h3>
+                                <select id="orderSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                                    <option value="">-- Pilih Pesanan --</option>
+                                    <!-- Options will be loaded from API -->
+                                </select>
+                                <div id="orderDetails" class="mt-4 hidden">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-medium">Detail Pesanan</h4>
+                                        <p id="orderCustomer" class="text-sm text-gray-600"></p>
+                                        <p id="orderWeight" class="text-sm text-gray-600"></p>
+                                        <p id="orderAmount" class="text-sm text-gray-600"></p>
+                                        <p id="orderStatus" class="text-sm"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div id="paymentMethodSection" class="hidden">
+                                <h3 class="text-lg font-semibold mb-4">Metode Pembayaran</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="payment-method border-2 rounded-lg p-4 text-center cursor-pointer" data-method="Transfer Bank">
+                                        <div class="w-16 h-16 mx-auto mb-2 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                                            <i class="fas fa-university text-2xl"></i>
+                                        </div>
+                                        <p class="font-medium">Transfer Bank</p>
+                                        <p class="text-sm text-gray-500">BCA, BRI, Mandiri, dll</p>
+                                    </div>
+                                    <div class="payment-method border-2 rounded-lg p-4 text-center cursor-pointer" data-method="E-Wallet">
+                                        <div class="w-16 h-16 mx-auto mb-2 bg-green-50 rounded-full flex items-center justify-center text-green-500">
+                                            <i class="fas fa-wallet text-2xl"></i>
+                                        </div>
+                                        <p class="font-medium">E-Wallet</p>
+                                        <p class="text-sm text-gray-500">OVO, Gopay, Dana, dll</p>
+                                    </div>
+                                    <div class="payment-method border-2 rounded-lg p-4 text-center cursor-pointer" data-method="Tunai">
+                                        <div class="w-16 h-16 mx-auto mb-2 bg-purple-50 rounded-full flex items-center justify-center text-purple-500">
+                                            <i class="fas fa-money-bill-wave text-2xl"></i>
+                                        </div>
+                                        <p class="font-medium">Tunai</p>
+                                        <p class="text-sm text-gray-500">Bayar di tempat</p>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="paymentMethod" name="paymentMethod">
+                            </div>
+
+                            <!-- Payment Amount -->
+                            <div id="paymentAmountSection" class="hidden">
+                                <h3 class="text-lg font-semibold mb-4">Jumlah Pembayaran</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                    <p class="text-sm text-gray-600 mb-1">Total Tagihan</p>
+                                    <p id="billAmount" class="text-xl font-bold text-purple-600">Rp0</p>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Jumlah Dibayar</label>
+                                    <input type="number" id="amount" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Masukkan jumlah pembayaran">
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="fullPayment" class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                                    <label for="fullPayment" class="ml-2 block text-sm text-gray-700">Bayar lunas sesuai tagihan</label>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="flex justify-between pt-4">
+                                <button type="button" id="prevBtn" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 hidden">
+                                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                                </button>
+                                <button type="button" id="nextBtn" class="ml-auto px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md">
+                                    Lanjut <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                                <button type="submit" id="submitBtn" class="ml-auto px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md hidden">
+                                    <i class="fas fa-credit-card mr-2"></i> Bayar Sekarang
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Payment History -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Riwayat Pembayaran</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="paymentHistory">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Memuat riwayat pembayaran...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2023 Laundry RR. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        let currentStep = 1;
+        let selectedOrder = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load customer's orders
+            loadCustomerOrders();
+            
+            // Load payment history
+            loadPaymentHistory();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Check if order_id is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id');
+            if (orderId) {
+                document.getElementById('orderId').value = orderId;
+                loadOrderDetails(orderId);
+            }
+        });
+
+        function setupEventListeners() {
+            // Order selection
+            document.getElementById('orderSelect').addEventListener('change', function() {
+                const orderId = this.value;
+                if (orderId) {
+                    document.getElementById('orderId').value = orderId;
+                    loadOrderDetails(orderId);
+                } else {
+                    document.getElementById('orderDetails').classList.add('hidden');
+                }
+            });
+
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('selected', 'border-purple-500');
+                    });
+                    this.classList.add('selected', 'border-purple-500');
+                    document.getElementById('paymentMethod').value = this.dataset.method;
+                });
+            });
+
+            // Full payment checkbox
+            document.getElementById('fullPayment').addEventListener('change', function() {
+                if (this.checked && selectedOrder) {
+                    document.getElementById('amount').value = selectedOrder.total_price;
+                }
+            });
+
+            // Next/prev buttons
+            document.getElementById('nextBtn').addEventListener('click', nextStep);
+            document.getElementById('prevBtn').addEventListener('click', prevStep);
+
+            // Form submission
+            document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
+        }
+
+        async function loadCustomerOrders() {
+            try {
+                const authUser = JSON.parse(localStorage.getItem('authUser'));
+                if (!authUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/orders?user_id=${authUser.id}`);
+                const data = await response.json();
+                
+                const orderSelect = document.getElementById('orderSelect');
+                orderSelect.innerHTML = '<option value="">-- Pilih Pesanan --</option>';
+                
+                if (data.data && data.data.length > 0) {
+                    data.data.forEach(order => {
+                        const option = document.createElement('option');
+                        option.value = order.id;
+                        option.textContent = `Order #${order.id} - ${order.status === 'Done' ? 'Selesai' : 'Proses'} - Rp${order.total_price.toLocaleString('id-ID')}`;
+                        orderSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        async function loadOrderDetails(orderId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+                const { data: order } = await response.json();
+                
+                selectedOrder = order;
+                
+                document.getElementById('orderCustomer').textContent = `Pelanggan: ${order.user?.name || 'Tidak ada data'}`;
+                document.getElementById('orderWeight').textContent = `Berat: ${order.weight} kg`;
+                document.getElementById('orderAmount').textContent = `Total: Rp${order.total_price.toLocaleString('id-ID')}`;
+                
+                const statusElement = document.getElementById('orderStatus');
+                statusElement.textContent = `Status: ${order.status === 'Done' ? 'Selesai' : 'Proses'}`;
+                statusElement.className = order.status === 'Done' ? 'text-sm text-green-600' : 'text-sm text-yellow-600';
+                
+                document.getElementById('orderDetails').classList.remove('hidden');
+                document.getElementById('billAmount').textContent = `Rp${order.total_price.toLocaleString('id-ID')}`;
+                
+                // Show next section if order is selected
+                document.getElementById('paymentMethodSection').classList.remove('hidden');
+                updateStepVisual(2);
+            } catch (error) {
+                console.error('Error loading order details:', error);
+            }
+        }
+
+        async function loadPaymentHistory() {
+            try {
+                const authUser = JSON.parse(localStorage.getItem('authUser'));
+                if (!authUser) return;
+
+                const response = await fetch(`${API_BASE_URL}/payments/`);
+                const { data: payments } = await response.json();
+                
+                const tbody = document.getElementById('paymentHistory');
+                tbody.innerHTML = '';
+                
+                if (payments && payments.length > 0) {
+                    payments.forEach(payment => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(payment.payment_date).toLocaleDateString('id-ID')}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.method}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp${payment.amount.toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full ${payment.status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    ${payment.status ? 'Lunas' : 'Pending'}
+                                </span>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada riwayat pembayaran</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading payment history:', error);
+                document.getElementById('paymentHistory').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat riwayat pembayaran</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1 && !document.getElementById('orderId').value) {
+                alert('Silakan pilih pesanan terlebih dahulu');
+                return;
+            }
+            
+            if (currentStep === 2 && !document.getElementById('paymentMethod').value) {
+                alert('Silakan pilih metode pembayaran');
+                return;
+            }
+            
+            if (currentStep === 3 && !document.getElementById('amount').value) {
+                alert('Silakan masukkan jumlah pembayaran');
+                return;
+            }
+            
+            currentStep++;
+            updateStepVisual(currentStep);
+            
+            if (currentStep === 2) {
+                document.getElementById('paymentMethodSection').classList.remove('hidden');
+                document.getElementById('prevBtn').classList.remove('hidden');
+            } else if (currentStep === 3) {
+                document.getElementById('paymentAmountSection').classList.remove('hidden');
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('submitBtn').classList.remove('hidden');
+            }
+        }
+
+        function prevStep() {
+            currentStep--;
+            updateStepVisual(currentStep);
+            
+            if (currentStep === 1) {
+                document.getElementById('paymentMethodSection').classList.add('hidden');
+                document.getElementById('prevBtn').classList.add('hidden');
+            } else if (currentStep === 2) {
+                document.getElementById('paymentAmountSection').classList.add('hidden');
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('submitBtn').classList.add('hidden');
+            }
+        }
+
+        function updateStepVisual(step) {
+            document.querySelectorAll('.step').forEach((el, index) => {
+                const number = el.querySelector('div');
+                const text = el.querySelector('p');
+                
+                if (index + 1 === step) {
+                    number.classList.remove('bg-gray-200', 'text-gray-600');
+                    number.classList.add('bg-purple-600', 'text-white');
+                    text.classList.remove('text-gray-500');
+                    text.classList.add('text-purple-600', 'font-medium');
+                } else if (index + 1 < step) {
+                    number.classList.remove('bg-gray-200', 'text-gray-600');
+                    number.classList.add('bg-green-500', 'text-white');
+                    text.classList.remove('text-gray-500');
+                    text.classList.add('text-green-600', 'font-medium');
+                } else {
+                    number.classList.remove('bg-purple-600', 'text-white', 'bg-green-500');
+                    number.classList.add('bg-gray-200', 'text-gray-600');
+                    text.classList.remove('text-purple-600', 'font-medium', 'text-green-600');
+                    text.classList.add('text-gray-500');
+                }
+            });
+        }
+
+        async function handlePaymentSubmit(e) {
+            e.preventDefault();
+            
+            const paymentData = {
+                order_id: document.getElementById('orderId').value,
+                method: document.getElementById('paymentMethod').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                status: true, // Assuming payment is successful when submitted
+                payment_date: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/payments/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Pembayaran berhasil diproses!');
+                    loadPaymentHistory();
+                    
+                    // Reset form
+                    document.getElementById('paymentForm').reset();
+                    document.querySelectorAll('.payment-method').forEach(m => {
+                        m.classList.remove('selected', 'border-purple-500');
+                    });
+                    document.getElementById('paymentMethod').value = '';
+                    document.getElementById('orderDetails').classList.add('hidden');
+                    document.getElementById('orderSelect').value = '';
+                    
+                    // Reset steps
+                    currentStep = 1;
+                    updateStepVisual(currentStep);
+                    document.getElementById('paymentMethodSection').classList.add('hidden');
+                    document.getElementById('paymentAmountSection').classList.add('hidden');
+                    document.getElementById('prevBtn').classList.add('hidden');
+                    document.getElementById('nextBtn').classList.remove('hidden');
+                    document.getElementById('submitBtn').classList.add('hidden');
+                } else {
+                    throw new Error(data.message || 'Gagal memproses pembayaran');
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -24,11 +24,28 @@
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'blob': 'blob 7s infinite',
+                        'fade-in': 'fadeIn 1s ease-in',
+                        'slide-up': 'slideUp 0.8s ease-out'
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-20px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
                         }
                     }
                 }
@@ -46,26 +63,44 @@
             .transition-slow {
                 transition: all 0.6s ease;
             }
+            .animation-delay-2000 {
+                animation-delay: 2s;
+            }
+            .animation-delay-4000 {
+                animation-delay: 4s;
+            }
         }
     </style>
 </head>
-<body class="font-poppins bg-gray-50 text-dark">
+<body class="font-poppins bg-gray-50 text-dark scroll-smooth">
     <!-- Header -->
-    <header class="fixed w-full z-50 bg-white shadow-md transition-slow">
+    <header class="fixed w-full z-50 bg-white shadow-md transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="flex items-center space-x-2">
-                <img src="public/assets/image/logo.jpg" alt="Laundry RR Logo" class="h-10 rounded-full border-2 border-primary">
+                <img src="public/assets/image/logo.jpg" alt="Laundry RR Logo" class="h-10 rounded-full border-2 border-primary animate-pulse-slow">
                 <span class="text-xl font-bold text-primary">Laundry RR</span>
             </a>
             
             <nav class="hidden md:flex space-x-8">
-                <a href="#" class="text-primary font-medium hover:text-secondary transition-slow">HOME</a>
-                <a href="#about" class="text-gray-600 hover:text-primary transition-slow">ABOUT</a>
-                <a href="#price-list" class="text-gray-600 hover:text-primary transition-slow">PRICE LIST</a>
-                <a href="#contact" class="text-gray-600 hover:text-primary transition-slow">HUBUNGI KAMI</a>
+                <a href="#" class="text-primary font-medium hover:text-secondary transition-colors duration-300 relative group">
+                    HOME
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#about" class="text-gray-600 hover:text-primary transition-colors duration-300 relative group">
+                    ABOUT
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#price-list" class="text-gray-600 hover:text-primary transition-colors duration-300 relative group">
+                    PRICE LIST
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#contact" class="text-gray-600 hover:text-primary transition-colors duration-300 relative group">
+                    HUBUNGI KAMI
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                </a>
             </nav>
             
-            <a href="#contact" class="hidden md:flex items-center space-x-2 bg-primary hover:bg-secondary text-white px-4 py-2 rounded-full transition-slow">
+            <a href="https://wa.me/628562519826" target="_blank" class="hidden md:flex items-center space-x-2 bg-primary hover:bg-secondary text-white px-4 py-2 rounded-full transition-all duration-300 hover:shadow-lg">
                 <i class="fab fa-whatsapp"></i>
                 <span>Hubungi kami</span>
             </a>
@@ -78,11 +113,11 @@
         
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white px-6 pb-4 transition-all duration-300 ease-in-out">
-            <a href="#" class="block py-2 text-primary font-medium">HOME</a>
-            <a href="#about" class="block py-2 text-gray-600 hover:text-primary">ABOUT</a>
-            <a href="#price-list" class="block py-2 text-gray-600 hover:text-primary">PRICE LIST</a>
-            <a href="#contact" class="block py-2 text-gray-600 hover:text-primary">HUBUNGI KAMI</a>
-            <a href="#contact" class="flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-full mt-2 w-full">
+            <a href="#" class="block py-2 text-primary font-medium transition-colors duration-200">HOME</a>
+            <a href="#about" class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">ABOUT</a>
+            <a href="#price-list" class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">PRICE LIST</a>
+            <a href="#contact" class="block py-2 text-gray-600 hover:text-primary transition-colors duration-200">HUBUNGI KAMI</a>
+            <a href="https://wa.me/628562519826" target="_blank" class="flex items-center justify-center space-x-2 bg-primary text-white px-4 py-2 rounded-full mt-2 w-full transition-colors duration-200 hover:bg-secondary">
                 <i class="fab fa-whatsapp"></i>
                 <span>Hubungi kami</span>
             </a>
@@ -94,26 +129,26 @@
         <div class="container mx-auto px-6 flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-12 md:mb-0 animate-fade-in">
                 <span class="inline-block bg-primary text-white text-sm px-4 py-1 rounded-full mb-4 animate-pulse-slow">#1 Jasa Laundry Terpercaya di Yogyakarta</span>
-                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+                <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6 animate-slide-up">
                     Laundry <span class="text-primary">24 Jam</span> <br>Layanan Antar Jemput
                 </h1>
-                <p class="text-lg text-gray-600 mb-8">
+                <p class="text-lg text-gray-600 mb-8 animate-slide-up animation-delay-2000">
                     Dengan layanan antar jemput, kami memastikan pakaian Anda selalu bersih, rapi, dan sampai tepat waktu sesuai jadwal
                 </p>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="#contact" class="bg-primary hover:bg-secondary text-white px-6 py-3 rounded-full text-center transition-slow transform hover:scale-105 shadow-lg">
-                        Hubungi Kami
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-slide-up animation-delay-4000">
+                    <a href="https://wa.me/628562519826" target="_blank" class="bg-primary hover:bg-secondary text-white px-6 py-3 rounded-full text-center transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fab fa-whatsapp mr-2"></i> Hubungi Kami
                     </a>
-                    <a href="#price-list" class="border border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 rounded-full text-center transition-slow transform hover:scale-105">
+                    <a href="#price-list" class="border border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 rounded-full text-center transition-all duration-300 transform hover:scale-105">
                         Selengkapnya <i class="fas fa-arrow-right ml-2"></i>
                     </a>
                 </div>
             </div>
-            <div class="md:w-1/2 relative animate-float">
+            <div class="md:w-1/2 relative">
                 <div class="absolute -top-10 -right-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
                 <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-primary rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-                <div class="relative">
-                    <img src="public/assets/image/logo.jpg" alt="Laundry Service" class="w-full max-w-md mx-auto rounded-2xl shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-slow">
+                <div class="relative animate-float">
+                    <img src="public/assets/image/logo.jpg" alt="Laundry Service" class="w-full max-w-md mx-auto rounded-2xl shadow-2xl border-4 border-white transform rotate-2 hover:rotate-0 transition-all duration-500">
                 </div>
             </div>
         </div>
@@ -125,8 +160,8 @@
             <div class="flex flex-col md:flex-row items-center">
                 <div class="md:w-1/2 mb-12 md:mb-0 md:pr-12">
                     <div class="relative">
-                        <div class="absolute -top-6 -left-6 w-full h-full border-4 border-primary rounded-2xl z-0"></div>
-                        <img src="https://images.unsplash.com/photo-1604176354204-9268737828e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Laundry Service" class="relative z-10 rounded-2xl shadow-lg transform hover:scale-105 transition-slow">
+                        <div class="absolute -top-6 -left-6 w-full h-full border-4 border-primary rounded-2xl z-0 animate-pulse-slow"></div>
+                        <img src="https://images.unsplash.com/photo-1604176354204-9268737828e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Laundry Service" class="relative z-10 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-500">
                     </div>
                 </div>
                 <div class="md:w-1/2">
@@ -138,177 +173,300 @@
                         Dilengkapi dengan mesin modern dan tim profesional berpengalaman, kami memberikan hasil cucian yang maksimal. Tidak hanya itu, harga terjangkau membuat layanan kami semakin diminati tanpa mengorbankan kualitas.
                     </p>
                     <div class="flex flex-wrap gap-4 mb-8">
-                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-primary"></i>
+                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 hover:shadow-sm">
+                            <i class="fas fa-check-circle text-primary animate-bounce"></i>
                             <span>Layanan 24 Jam</span>
                         </div>
-                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-primary"></i>
+                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 hover:shadow-sm">
+                            <i class="fas fa-check-circle text-primary animate-bounce animation-delay-2000"></i>
                             <span>Antar Jemput Gratis</span>
                         </div>
-                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full">
-                            <i class="fas fa-check-circle text-primary"></i>
+                        <div class="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-full transition-all duration-300 hover:bg-indigo-100 hover:shadow-sm">
+                            <i class="fas fa-check-circle text-primary animate-bounce animation-delay-4000"></i>
                             <span>Peralatan Modern</span>
                         </div>
                     </div>
-                    <a href="#contact" class="inline-block bg-primary hover:bg-secondary text-white px-6 py-3 rounded-full transition-slow transform hover:scale-105 shadow-lg">
-                        Hubungi kami
+                    <a href="https://wa.me/628562519826" target="_blank" class="inline-flex items-center bg-primary hover:bg-secondary text-white px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i class="fab fa-whatsapp mr-3"></i> Hubungi kami
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Price List Section -->
-    <section id="price-list" class="py-20 bg-gray-50">
+   <section id="price-list" class="py-12 bg-gray-100">
+    <div class="container mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Daftar Harga Laundry RR</h2>
+            <p class="text-gray-600">
+                Pilih layanan laundry yang sesuai dengan kebutuhan Anda. Kami menawarkan berbagai pilihan dengan harga yang kompetitif dan kualitas terjamin.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Regular Service -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2 group">
+                <div class="bg-green-500 text-white py-4 px-6 text-center relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-green-600 rounded-full opacity-20"></div>
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-green-700 rounded-full opacity-20 animate-ping animation-delay-2000"></div>
+                    <h3 class="text-xl font-semibold mb-1 relative z-10">Reguler</h3>
+                    <p class="text-2xl font-bold relative z-10">Rp 10.000<span class="text-sm font-normal">/Kg</span></p>
+                </div>
+                <div class="p-6">
+                    <ul class="space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span>Waktu pengerjaan standar (24 jam)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span>Cuci, kering, lipat</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span>Cocok untuk penggunaan sehari-hari</span>
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <a href="view/login.html" class="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full transition-all duration-300 transform group-hover:scale-105 w-full">
+                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Express Service -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2 group">
+                <div class="bg-blue-500 text-white py-4 px-6 text-center relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-blue-600 rounded-full opacity-20"></div>
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-blue-700 rounded-full opacity-20 animate-ping"></div>
+                    <h3 class="text-xl font-semibold mb-1 relative z-10">Express</h3>
+                    <p class="text-2xl font-bold relative z-10">Rp 15.000<span class="text-sm font-normal">/Kg</span></p>
+                </div>
+                <div class="p-6">
+                    <ul class="space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <i class="fas fa-bolt text-blue-500 mr-2 animate-pulse"></i>
+                            <span>Waktu pengerjaan lebih cepat (6-12 jam)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-blue-500 mr-2"></i>
+                            <span>Cuci, kering, setrika, lipat</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-blue-500 mr-2"></i>
+                            <span>Ideal untuk kebutuhan mendesak</span>
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <a href="view/login.html" class="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full transition-all duration-300 transform group-hover:scale-105 w-full">
+                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Service -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2 group">
+                <div class="bg-indigo-500 text-white py-4 px-6 text-center relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-indigo-600 rounded-full opacity-20"></div>
+                    <div class="absolute -right-8 -top-8 w-20 h-20 bg-indigo-700 rounded-full opacity-20 animate-ping animation-delay-4000"></div>
+                    <h3 class="text-xl font-semibold mb-1 relative z-10">Premium</h3>
+                    <p class="text-2xl font-bold relative z-10">Rp 20.000<span class="text-sm font-normal">/Kg</span></p>
+                </div>
+                <div class="p-6">
+                    <ul class="space-y-2 mb-4">
+                        <li class="flex items-center">
+                            <i class="fas fa-crown text-indigo-500 mr-2"></i>
+                            <span>Waktu pengerjaan tercepat (4 jam)</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-indigo-500 mr-2"></i>
+                            <span>Cuci, kering, setrika premium, lipat rapi</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check-circle text-indigo-500 mr-2"></i>
+                            <span>Penanganan khusus untuk pakaian tertentu</span>
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <a href="view/login.html" class="inline-flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-full transition-all duration-300 transform group-hover:scale-105 w-full">
+                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-primary to-secondary text-white clip-path-cta">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-6 animate-fade-in">Pesan Sekarang dan Rasakan Kemudahan Laundry!</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto animate-fade-in animation-delay-2000">
+                Nikmati layanan laundry profesional dengan antar-jemput cepat dan hasil cucian bersih maksimal. Klik tombol di bawah ini untuk memesan sekarang dan biarkan kami mengurus cucian Anda!
+            </p>
+            <a href="https://wa.me/628562519826" target="_blank" class="inline-flex items-center bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl animate-fade-in animation-delay-4000">
+                <i class="fab fa-whatsapp mr-3 text-2xl"></i> Hubungi Kami
+            </a>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-white">
         <div class="container mx-auto px-6">
-            <div class="text-center max-w-2xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold mb-4">Price List Laundry RR</h2>
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Apa Kata Pelanggan Kami</h2>
                 <p class="text-gray-600">
-                    Temukan layanan laundry berkualitas dengan harga terjangkau di Laundry RR. Kami menyediakan berbagai pilihan paket yang sesuai untuk kebutuhan anda, lengkap dengan layanan antar-jemput.
+                    Testimoni dari pelanggan setia Laundry RR yang puas dengan layanan kami
                 </p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- 4 Jam -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-slow transform hover:-translate-y-2">
-                    <div class="bg-primary text-white py-4 px-6">
-                        <h3 class="text-xl font-bold">4 Jam</h3>
-                        <p class="text-2xl font-bold">Rp 22.000<span class="text-sm font-normal">/Kg</span></p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Customer" class="w-12 h-12 rounded-full border-2 border-primary">
+                        <div class="ml-4">
+                            <h4 class="font-semibold">Sarah Wijaya</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-primary mt-1 mr-2"></i>
-                                <span>Minimal Berat 3Kg</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-primary mt-1 mr-2"></i>
-                                <span>Layanan 4 Jam Selesai</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-primary mt-1 mr-2"></i>
-                                <span>Cuci Kering - Setrika - Lipat</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-primary mt-1 mr-2"></i>
-                                <span>Gratis Jemput & Antar</span>
-                            </li>
-                        </ul>
-                        <a href="view/login.html" class="block w-full bg-primary hover:bg-secondary text-white text-center py-3 rounded-lg transition-slow">
-                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
-                        </a>
-                    </div>
+                    <p class="text-gray-600 italic">
+                        "Pelayanan sangat cepat dan hasil cucian bersih sekali. Sudah langganan 2 tahun dan tidak pernah kecewa. Recommended banget!"
+                    </p>
                 </div>
-                
-                <!-- 6 Jam -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-slow transform hover:-translate-y-2">
-                    <div class="bg-secondary text-white py-4 px-6">
-                        <h3 class="text-xl font-bold">6 Jam</h3>
-                        <p class="text-2xl font-bold">Rp 17.000<span class="text-sm font-normal">/Kg</span></p>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Customer" class="w-12 h-12 rounded-full border-2 border-primary">
+                        <div class="ml-4">
+                            <h4 class="font-semibold">Budi Santoso</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-secondary mt-1 mr-2"></i>
-                                <span>Minimal Berat 3Kg</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-secondary mt-1 mr-2"></i>
-                                <span>Layanan 6 Jam Selesai</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-secondary mt-1 mr-2"></i>
-                                <span>Cuci Kering - Setrika - Lipat</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-secondary mt-1 mr-2"></i>
-                                <span>Gratis Jemput & Antar</span>
-                            </li>
-                        </ul>
-                        <a href="view/login.html" class="block w-full bg-secondary hover:bg-primary text-white text-center py-3 rounded-lg transition-slow">
-                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
-                        </a>
-                    </div>
+                    <p class="text-gray-600 italic">
+                        "Layanan antar jemput sangat membantu karena saya sibuk bekerja. Cucian selalu rapi dan wangi. Harga juga bersaing."
+                    </p>
                 </div>
-                
-                <!-- 12 Jam -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-slow transform hover:-translate-y-2">
-                    <div class="bg-accent text-white py-4 px-6">
-                        <h3 class="text-xl font-bold">12 Jam</h3>
-                        <p class="text-2xl font-bold">Rp 13.000<span class="text-sm font-normal">/Kg</span></p>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" class="w-12 h-12 rounded-full border-2 border-primary">
+                        <div class="ml-4">
+                            <h4 class="font-semibold">Dewi Lestari</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                                <span>Minimal Berat 3Kg</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                                <span>Layanan 12 Jam Selesai</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                                <span>Cuci Kering - Setrika - Lipat</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-accent mt-1 mr-2"></i>
-                                <span>Gratis Jemput & Antar</span>
-                            </li>
-                        </ul>
-                        <a href="view/login.html" class="block w-full bg-accent hover:bg-primary text-white text-center py-3 rounded-lg transition-slow">
-                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 24 Jam -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-slow transform hover:-translate-y-2">
-                    <div class="bg-dark text-white py-4 px-6">
-                        <h3 class="text-xl font-bold">24 Jam</h3>
-                        <p class="text-2xl font-bold">Rp 9.000<span class="text-sm font-normal">/Kg</span></p>
-                    </div>
-                    <div class="p-6">
-                        <ul class="space-y-3 mb-6">
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-dark mt-1 mr-2"></i>
-                                <span>Minimal Berat 3Kg</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-dark mt-1 mr-2"></i>
-                                <span>Layanan 24 Jam Selesai</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-dark mt-1 mr-2"></i>
-                                <span>Cuci Kering - Setrika - Lipat</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check text-dark mt-1 mr-2"></i>
-                                <span>Gratis Jemput & Antar</span>
-                            </li>
-                        </ul>
-                        <a href="view/login.html" class="block w-full bg-dark hover:bg-primary text-white text-center py-3 rounded-lg transition-slow">
-                            <i class="fab fa-whatsapp mr-2"></i> Pesan Sekarang
-                        </a>
-                    </div>
+                    <p class="text-gray-600 italic">
+                        "Saya suka pakai layanan express karena sering butuh cepat. Meski express, kualitas tetap bagus. Pakaian tidak cepat rusak."
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-primary to-secondary text-white clip-path-cta">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-6">Pesan Sekarang dan Rasakan Kemudahan Laundry!</h2>
-            <p class="text-xl mb-8 max-w-2xl mx-auto">
-                Nikmati layanan laundry profesional dengan antar-jemput cepat dan hasil cucian bersih maksimal. Klik tombol di bawah ini untuk memesan sekarang dan biarkan kami mengurus cucian Anda!
+    <section class="py-16 bg-gray-100">
+    <div class="container mx-auto px-6">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Pertanyaan Umum</h2>
+            <p class="text-gray-600">
+                Temukan jawaban untuk pertanyaan yang sering diajukan tentang layanan kami
             </p>
-            <a href="#contact" class="inline-flex items-center bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-full text-lg font-medium transition-slow transform hover:scale-105 shadow-lg">
-                <i class="fab fa-whatsapp mr-3 text-2xl"></i> Hubungi Kami
-            </a>
         </div>
-    </section>
+
+        <div class="max-w-3xl mx-auto">
+            <div class="mb-4 border-b border-gray-200 pb-4">
+                <button class="faq-button flex justify-between items-center w-full text-left font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-300">
+                    <span>Berapa lama waktu pengerjaan laundry?</span>
+                    <i class="fas fa-chevron-down text-sm transform transition-transform duration-300 faq-icon"></i>
+                </button>
+                <div class="faq-answer mt-2 text-gray-600 hidden">
+                    <p>Waktu pengerjaan tergantung jenis layanan yang dipilih. Layanan reguler 24 jam, express 6-12 jam, dan premium 4 jam. Waktu mulai dihitung setelah pakaian diterima di outlet kami.</p>
+                </div>
+            </div>
+
+            <div class="mb-4 border-b border-gray-200 pb-4">
+                <button class="faq-button flex justify-between items-center w-full text-left font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-300">
+                    <span>Apakah ada minimal berat untuk laundry?</span>
+                    <i class="fas fa-chevron-down text-sm transform transition-transform duration-300 faq-icon"></i>
+                </button>
+                <div class="faq-answer mt-2 text-gray-600 hidden">
+                    <p>Kami tidak menerapkan minimal berat. Anda bisa laundry mulai dari 0.5 kg dengan harga tetap Rp 10.000/kg untuk layanan reguler.</p>
+                </div>
+            </div>
+
+            <div class="mb-4 border-b border-gray-200 pb-4">
+                <button class="faq-button flex justify-between items-center w-full text-left font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-300">
+                    <span>Bagaimana cara pemesanan antar-jemput?</span>
+                    <i class="fas fa-chevron-down text-sm transform transition-transform duration-300 faq-icon"></i>
+                </button>
+                <div class="faq-answer mt-2 text-gray-600 hidden">
+                    <p>Anda bisa menghubungi kami via WhatsApp di 0856-2519-826 untuk menjadwalkan antar-jemput. Tim kami akan datang ke lokasi Anda sesuai waktu yang disepakati.</p>
+                </div>
+            </div>
+
+            <div class="mb-4 border-b border-gray-200 pb-4">
+                <button class="faq-button flex justify-between items-center w-full text-left font-medium text-gray-700 hover:text-blue-600 focus:outline-none transition-colors duration-300">
+                    <span>Apakah ada layanan khusus untuk pakaian tertentu?</span>
+                    <i class="fas fa-chevron-down text-sm transform transition-transform duration-300 faq-icon"></i>
+                </button>
+                <div class="faq-answer mt-2 text-gray-600 hidden">
+                    <p>Ya, untuk pakaian khusus seperti jas, gaun, atau pakaian berbahan khusus, kami menyediakan layanan dry cleaning dengan harga khusus. Silakan konsultasikan kebutuhan Anda via WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqButtons = document.querySelectorAll('.faq-button');
+
+        faqButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const icon = this.querySelector('.faq-icon');
+
+                answer.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+    });
+</script>
+
+<style>
+    .rotate-180 {
+        transform: rotate(180deg);
+    }
+    .transition-colors {
+        transition: color 0.3s ease-in-out;
+    }
+    .transition-transform {
+        transition: transform 0.3s ease-in-out;
+    }
+</style>
 
     <!-- Footer Section -->
     <footer id="contact" class="bg-dark text-gray-300 pt-20 pb-10">
@@ -323,13 +481,13 @@
                         Solusi laundry terbaik di Yogyakarta dengan layanan antar-jemput, cucian bersih maksimal, dan pelayanan 24 jam. Hubungi kami untuk layanan laundry rumah tangga, hotel, atau perusahaan Anda.
                     </p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-slow">
+                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-all duration-300 transform hover:scale-125">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-slow">
+                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-all duration-300 transform hover:scale-125">
                             <i class="fab fa-tiktok"></i>
                         </a>
-                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-slow">
+                        <a href="#" class="text-gray-300 hover:text-white text-xl transition-all duration-300 transform hover:scale-125">
                             <i class="fab fa-instagram"></i>
                         </a>
                     </div>
@@ -338,21 +496,21 @@
                 <div class="footer-links">
                     <h3 class="text-white text-xl font-bold mb-6">Outlet Kami</h3>
                     <ul class="space-y-4">
-                        <li class="flex items-start">
+                        <li class="flex items-start transition-all duration-300 hover:text-white">
                             <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
                             <div>
                                 <strong class="text-white">Outlet Gejayan</strong>
                                 <p class="text-sm">Jalan Gejayan No. 7, Depok, Sleman</p>
                             </div>
                         </li>
-                        <li class="flex items-start">
+                        <li class="flex items-start transition-all duration-300 hover:text-white">
                             <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
                             <div>
                                 <strong class="text-white">Outlet Wonorejo</strong>
                                 <p class="text-sm">Jalan Wonorejo, Wedomartani, Ngemplak, Sleman</p>
                             </div>
                         </li>
-                        <li class="flex items-start">
+                        <li class="flex items-start transition-all duration-300 hover:text-white">
                             <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
                             <div>
                                 <strong class="text-white">Outlet Kaliurang</strong>
@@ -365,15 +523,15 @@
                 <div class="footer-contact">
                     <h3 class="text-white text-xl font-bold mb-6">Kontak Kami</h3>
                     <ul class="space-y-4">
-                        <li class="flex items-center">
+                        <li class="flex items-center transition-all duration-300 hover:text-white">
                             <i class="fab fa-whatsapp text-primary text-xl mr-3"></i>
-                            <span>08123-456-7890</span>
+                            <a href="https://wa.me/628562519826" target="_blank">0856-2519-826</a>
                         </li>
-                        <li class="flex items-center">
+                        <li class="flex items-center transition-all duration-300 hover:text-white">
                             <i class="fas fa-phone text-primary text-xl mr-3"></i>
-                            <span>08123-456-7890</span>
+                            <span>(0274) 1234567</span>
                         </li>
-                        <li class="flex items-center">
+                        <li class="flex items-center transition-all duration-300 hover:text-white">
                             <i class="fas fa-envelope text-primary text-xl mr-3"></i>
                             <span>info@laundryrr.com</span>
                         </li>
@@ -381,11 +539,11 @@
                     
                     <div class="mt-8">
                         <h4 class="text-white font-medium mb-4">Jam Operasional</h4>
-                        <p class="flex justify-between border-b border-gray-700 py-2">
+                        <p class="flex justify-between border-b border-gray-700 py-2 transition-all duration-300 hover:text-white">
                             <span>Senin - Jumat</span>
                             <span>08:00 - 20:00</span>
                         </p>
-                        <p class="flex justify-between border-b border-gray-700 py-2">
+                        <p class="flex justify-between border-b border-gray-700 py-2 transition-all duration-300 hover:text-white">
                             <span>Sabtu - Minggu</span>
                             <span>09:00 - 17:00</span>
                         </p>
@@ -400,16 +558,45 @@
     </footer>
 
     <!-- WhatsApp Button -->
-    <a href="#" class="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg transform hover:scale-110 transition-slow z-50">
+    <a href="https://wa.me/628562519826" target="_blank" class="fixed bottom-8 right-8 bg-green-500 hover:bg-green-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg transform hover:scale-110 transition-all duration-300 z-50 animate-bounce">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <!-- Back to Top Button -->
-    <a href="#" id="back-to-top" class="fixed bottom-8 right-24 bg-primary hover:bg-secondary text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg transform hover:scale-110 transition-slow z-50 opacity-0 invisible">
+    <button id="back-to-top" class="fixed bottom-8 right-28 bg-primary hover:bg-secondary text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg transform transition-all duration-300 z-50 opacity-0 invisible">
         <i class="fas fa-chevron-up"></i>
-    </a>
+    </button>
 
     <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            this.querySelector('i').classList.toggle('fa-bars');
+            this.querySelector('i').classList.toggle('fa-times');
+        });
+
+        // Back to top button with smooth scroll
+        const backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.remove('opacity-100', 'visible');
+                backToTop.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        backToTop.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+      
         // Mobile menu toggle
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
@@ -460,5 +647,3 @@
             }
         });
     </script>
-</body>
-</html>

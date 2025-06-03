@@ -80,4 +80,15 @@ Content-Type: application/json
   "noHP": "08123456789",
   "role": "admin"
 }
+
 ###
+POST http://localhost:3000/add-users
+Content-Type: application/json
+
+{
+   "name": "RIOOOO",
+    "email": "rio123@gmail.com",
+    "password": "Riooke2004_",
+    "noHP": "00123220198",
+    "role": "user"
+}

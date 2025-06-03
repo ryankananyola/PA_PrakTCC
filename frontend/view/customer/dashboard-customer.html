@@ -3,54 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - LaundryRR</title>
+    <title>Dashboard Admin - LaundryRR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Animasi loading */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-fast {
+            animation: spin 1s linear infinite;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <div id="app">
-        <!-- Konten akan dimuat oleh JavaScript -->
         <div class="flex justify-center items-center h-screen">
-            <p class="text-lg">Memuat dashboard ian...</p>
+            <p class="text-lg">Memuat dashboard...</p>
+            <div id="loader-initial" class="animate-spin-fast rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 ml-4"></div>
         </div>
     </div>
 
-    <!-- Loading Indicator -->
     <div id="loader" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center hidden">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div class="animate-spin-fast rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
     </div>
 
-    <!-- Edit Order Modal -->
     <div id="edit-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Edit Pesanan</h3>
-                <button onclick="document.getElementById('edit-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                <h3 class="text-xl font-semibold text-gray-800">Edit Pesanan</h3>
+                <button onclick="document.getElementById('edit-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-700 focus:outline-none">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="edit-order-form">
+            <form id="edit-order-form" class="space-y-4">
                 <input type="hidden" id="edit-order-id">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Berat (kg)</label>
-                    <input type="number" id="edit-weight" class="w-full px-3 py-2 border rounded-md" step="0.1" min="0" required>
+                <div>
+                    <label for="edit-weight" class="block text-gray-700 text-sm font-bold mb-2">Berat (kg)</label>
+                    <input type="number" id="edit-weight" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" step="0.1" min="0" required>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Total Harga</label>
-                    <input type="number" id="edit-price" class="w-full px-3 py-2 border rounded-md" min="0" required>
+                <div>
+                    <label for="edit-price" class="block text-gray-700 text-sm font-bold mb-2">Total Harga</label>
+                    <input type="number" id="edit-price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" min="0" required>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Status</label>
-                    <select id="edit-status" class="w-full px-3 py-2 border rounded-md" required>
+                <div>
+                    <label for="edit-status" class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                    <select id="edit-status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="Pending">Pending</option>
                         <option value="Processing">Proses</option>
                         <option value="Done">Selesai</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')" class="px-4 py-2 border rounded-md">
+                    <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Batal
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Simpan
                     </button>
                 </div>
@@ -58,125 +67,149 @@
         </div>
     </div>
 
-    <!-- Alerts -->
-    <div id="error-alert" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden" role="alert"></div>
-    <div id="success-alert" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden" role="alert"></div>
+    <div id="error-alert" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden shadow-md" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline" id="error-message"></span>
+    </div>
+    <div id="success-alert" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden shadow-md" role="alert">
+        <strong class="font-bold">Sukses!</strong>
+        <span class="block sm:inline" id="success-message"></span>
+    </div>
 
     <script>
         const API_BASE_URL = 'http://localhost:3000';
+        const ORDERS_PER_PAGE = 5;
+        let currentPage = 1;
+        let allOrders = [];
+        let currentUserId; // Menyimpan ID user yang sedang login
 
         document.addEventListener('DOMContentLoaded', function() {
             // Cek session user
             checkAuth();
-            
-            // Load data orders
-            loadOrders();
-            
+
             // Event listeners
             document.addEventListener('click', function(e) {
-                if (e.target.id === 'logoutBtn') {
+                if (e.target.id === 'logout-btn') { // Menggunakan ID yang benar dari HTML
                     logout();
                 }
-                if (e.target.classList.contains('edit-btn')) {
-                    const orderId = e.target.closest('button').getAttribute('data-id');
+                if (e.target.classList.contains('edit-btn') || e.target.closest('.edit-btn')) {
+                    const orderId = e.target.closest('.edit-btn').getAttribute('data-id');
                     editOrder(orderId);
                 }
-                if (e.target.classList.contains('delete-btn')) {
-                    const orderId = e.target.closest('button').getAttribute('data-id');
+                if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                    const orderId = e.target.closest('.delete-btn').getAttribute('data-id');
                     confirmDelete(orderId);
                 }
+                if (e.target.classList.contains('pay-btn') || e.target.closest('.pay-btn')) {
+                    const orderId = e.target.closest('.pay-btn').getAttribute('data-id');
+                    window.location.href = `payment-customer.html?order_id=${orderId}`;
+                }
+                if (e.target.classList.contains('pagination-button')) {
+                    currentPage = parseInt(e.target.getAttribute('data-page'));
+                    renderOrderTable(allOrders, currentPage);
+                }
             });
-            
-            document.getElementById('search-input')?.addEventListener('input', handleSearch);
+
+            document.getElementById('search-input-order')?.addEventListener('input', handleSearchOrders); // Menggunakan ID yang benar
             document.getElementById('edit-order-form')?.addEventListener('submit', handleEditOrder);
         });
 
-        function checkAuth() {
-            const authUser = JSON.parse(localStorage.getItem('authUser'));
-            if (!authUser) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            renderDashboard(authUser);
-        }
+       function checkAuth() {
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            if (!authUser || authUser.role !== 'user') {
+                window.location.href = '../login.html'; // Sesuaikan path jika perlu
+                return;
+            }
+            currentUserId = authUser.id; // Simpan ID user
+            renderDashboard(authUser);
+            loadOrders(); // Panggil loadOrders setelah dashboard dirender
+        }loadOrders(); // Panggil loadOrders setelah dashboard dirender
+        
 
         function renderDashboard(user) {
             const app = document.getElementById('app');
-            
+
             app.innerHTML = `
-                <nav class="bg-blue-600 text-white p-4">
-                    <div class="container mx-auto flex justify-between">
-                        <h1 class="text-xl font-bold">Dashboard LaundryRR</h1>
+                <nav class="bg-blue-600 text-white p-4 shadow-md">
+                    <div class="container mx-auto flex justify-between items-center">
+                        <h1 class="text-xl font-bold animate-pulse">Dashboard LaundryRR</h1>
                         <div class="flex items-center space-x-4">
                             <span>Halo, ${user.name} (${user.role})</span>
-                            <button id="logoutBtn" class="bg-red-500 px-4 py-1 rounded">
+                            <button id="logout-btn" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Logout
                             </button>
                         </div>
                     </div>
                 </nav>
-                
-                <main class="container mx-auto p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow p-6">
+
+                <main class="container mx-auto p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Total Pesanan</p>
-                                    <h3 class="text-2xl font-bold" id="total-orders">0</h3>
+                                    <p class="text-gray-500 font-semibold">Total Pesanan</p>
+                                    <h3 class="text-2xl font-bold text-blue-600" id="total-orders">0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                                    <i class="fas fa-box-open"></i>
+                                    <i class="fas fa-box-open fa-lg"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-100">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Dalam Proses</p>
-                                    <h3 class="text-2xl font-bold" id="processing-orders">0</h3>
+                                    <p class="text-gray-500 font-semibold">Dalam Proses</p>
+                                    <h3 class="text-2xl font-bold text-yellow-600" id="processing-orders">0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                                    <i class="fas fa-spinner"></i>
+                                    <i class="fas fa-spinner fa-lg animate-spin"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-200">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Selesai</p>
-                                    <h3 class="text-2xl font-bold" id="completed-orders">0</h3>
+                                    <p class="text-gray-500 font-semibold">Selesai</p>
+                                    <h3 class="text-2xl font-bold text-green-600" id="completed-orders">0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-green-100 text-green-600">
-                                    <i class="fas fa-check-circle"></i>
+                                    <i class="fas fa-check-circle fa-lg"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-300">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500">Pendapatan</p>
-                                    <h3 class="text-2xl font-bold" id="total-revenue">Rp0</h3>
+                                    <p class="text-gray-500 font-semibold">Total Pendapatan Order</p>
+                                    <h3 class="text-2xl font-bold text-indigo-600" id="total-revenue">Rp0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                                    <i class="fas fa-money-bill-wave"></i>
+                                    <i class="fas fa-money-bill-wave fa-lg"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div class="flex items-center justify-between p-6 border-b">
-                            <h2 class="text-lg font-semibold">Daftar Pesanan</h2>
-                            <div class="relative">
-                                <input type="text" id="search-input" placeholder="Cari pesanan..." 
-                                    class="px-4 py-2 border rounded-md pl-10">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+                        <div class="px-6 py-4 border-b bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-lg font-semibold text-gray-700">Daftar Pesanan</h2>
+                                <div class="relative">
+                                    <input type="text" id="search-input-order" placeholder="Cari pesanan..."
+                                           class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <div id="order-loading" class="hidden flex justify-center py-4">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <div id="order-error" class="hidden text-red-500 mb-2"></div>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                                <thead class="bg-gray-100">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
@@ -188,9 +221,54 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200" id="orders-table-body">
-                                    <!-- Data akan diisi oleh JavaScript -->
+                                    <tr><td colspan="7" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Memuat data pesanan...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="px-6 py-3 bg-gray-50 flex justify-between items-center" id="pagination-container">
+                            <p class="text-sm text-gray-700" id="pagination-info"></p>
+                            <div class="space-x-2" id="pagination-buttons">
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="px-6 py-4 border-b bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-lg font-semibold text-gray-700">Daftar Pembayaran</h2>
+                                <div class="relative">
+                                    <input type="text" id="search-input-payment" placeholder="Cari pembayaran..."
+                                           class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="payment-loading" class="hidden flex justify-center py-4">
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <div id="payment-error" class="hidden text-red-500 mb-2"></div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Order</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="payments-table-body">
+                                    <tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Memuat data pembayaran...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="px-6 py-3 bg-gray-50 flex justify-between items-center" id="payment-pagination-container">
+                            <p class="text-sm text-gray-700" id="payment-pagination-info"></p>
+                            <div class="space-x-2" id="payment-pagination-buttons">
+                                </div>
                         </div>
                     </div>
                 </main>
@@ -199,138 +277,269 @@
 
         async function loadOrders() {
             try {
-                showLoading(true);
-                
+                showLoading('order-loading', true);
+
                 const response = await fetch(`${API_BASE_URL}/orders`);
                 if (!response.ok) {
                     throw new Error('Gagal memuat data pesanan');
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.status !== "success") {
                     throw new Error(data.message || 'Gagal memuat data pesanan');
                 }
-                
-                displayOrders(data.data);
-                updateStatistics(data.data);
-                
+
+                allOrders = data.data; // Simpan semua order untuk pencarian dan paginasi
+                renderOrderTable(allOrders, currentPage);
+                updateOrderStatistics(allOrders);
+
             } catch (error) {
-                showError(error.message);
+                showError('order-error', error.message);
             } finally {
-                showLoading(false);
+                showLoading('order-loading', false);
+                document.getElementById('loader-initial').classList.add('hidden'); // Sembunyikan loader awal
             }
         }
 
-        function displayOrders(orders) {
+        function renderOrderTable(ordersToDisplay, page) {
             const tbody = document.getElementById('orders-table-body');
-            if (!tbody) return;
-            
+            const paginationContainer = document.getElementById('pagination-container');
+            if (!tbody || !paginationContainer) return;
+
             tbody.innerHTML = '';
-            
-            if (orders.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4">Tidak ada data pesanan</td>
-                    </tr>
-                `;
+            const startIndex = (page - 1) * ORDERS_PER_PAGE;
+            const endIndex = startIndex + ORDERS_PER_PAGE;
+            const currentOrders = ordersToDisplay.slice(startIndex, endIndex);
+
+            if (currentOrders.length === 0 && ordersToDisplay.length > 0) {
+                // Jika tidak ada data di halaman saat ini tapi ada data total, kembali ke halaman terakhir
+                currentPage = Math.ceil(ordersToDisplay.length / ORDERS_PER_PAGE);
+                renderOrderTable(ordersToDisplay, currentPage);
                 return;
+            } else if (currentOrders.length === 0 && ordersToDisplay.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Tidak ada data pesanan</td></tr>`;
+                paginationContainer.classList.add('hidden');
+                return;
+            } else {
+                paginationContainer.classList.remove('hidden');
             }
-            
-            orders.forEach(order => {
+
+            currentOrders.forEach(order => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-gray-50';
+                tr.className = 'hover:bg-gray-50 transition-all duration-200';
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.user ? order.user.name : 'Tidak ada data'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Rp${order.totalPrice?.toLocaleString('id-ID') ?? '0'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        ${order.user ? order.user.name : 'Tidak ada data'}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${order.weight} kg</td>
-                    <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price.toLocaleString('id-ID')}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 rounded-full text-xs ${
-                            order.status === 'Done' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-yellow-100 text-yellow-800'
-                        }">
-                            ${order.status === 'Done' ? 'Selesai' : 'Proses'}
+                        <span class="inline-block px-2 py-1 text-xs font-semibold ${
+                            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'Processing' ? 'bg-blue-100 text-blue-800' :
+                            'bg-green-100 text-green-800'
+                        } rounded-full">
+                            ${order.status === 'Pending' ? 'Pending' :
+                            order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        ${new Date(order.created_at).toLocaleDateString('id-ID')}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <button class="edit-btn text-blue-600 hover:text-blue-900 mr-3" 
-                            data-id="${order.id}">
+                    <td class="px-6 py-4 whitespace-nowrap">${order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap flex space-x-2">
+                        <button class="edit-btn text-blue-500 hover:text-blue-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="delete-btn text-red-600 hover:text-red-900" 
-                            data-id="${order.id}">
+                        <button class="delete-btn text-red-500 hover:text-red-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Hapus">
                             <i class="fas fa-trash"></i>
                         </button>
+                        ${currentUserId === order.user.id ? // Perbaikan: Gunakan order.user.id
+                            `<button class="pay-btn text-purple-500 hover:text-purple-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Bayar">
+                                <i class="fas fa-credit-card"></i>
+                            </button>` :
+                            `<span class="text-gray-400" title="Bukan pemilik"><i class="fas fa-credit-card"></i></span>`
+                        }
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            renderPagination(ordersToDisplay.length, currentPage, 'pagination-buttons', 'pagination-info');
         }
 
-        function updateStatistics(orders) {
+        function renderPagination(totalItems, currentPage, buttonsContainerId, infoId) {
+            const totalPages = Math.ceil(totalItems / ORDERS_PER_PAGE);
+            const paginationButtonsContainer = document.getElementById(buttonsContainerId);
+            const paginationInfo = document.getElementById(infoId);
+
+            if (!paginationButtonsContainer || !paginationInfo) return;
+
+            paginationButtonsContainer.innerHTML = '';
+            paginationInfo.textContent = `Menampilkan ${((currentPage - 1) * ORDERS_PER_PAGE) + 1}-${Math.min(currentPage * ORDERS_PER_PAGE, totalItems)} dari ${totalItems}`;
+
+            if (totalPages <= 1) {
+                return;
+            }
+
+            const maxButtonsToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtonsToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtonsToShow - 1);
+
+            if (endPage - startPage + 1 < maxButtonsToShow && endPage === totalPages) {
+                startPage = Math.max(1, endPage - maxButtonsToShow + 1);
+            }
+
+            if (currentPage > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.textContent = 'Sebelumnya';
+                prevButton.className = 'pagination-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline';
+                prevButton.setAttribute('data-page', currentPage - 1);
+                paginationButtonsContainer.appendChild(prevButton);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = `pagination-button py-2 px-4 rounded focus:outline-none focus:shadow-outline ${currentPage === i ? 'bg-blue-500 text-white font-bold hover:bg-blue-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold'}`;
+                pageButton.setAttribute('data-page', i);
+                paginationButtonsContainer.appendChild(pageButton);
+            }
+
+            if (currentPage < totalPages) {
+                const nextButton = document.createElement('button');
+                nextButton.textContent = 'Selanjutnya';
+                nextButton.className = 'pagination-button bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline';
+                nextButton.setAttribute('data-page', currentPage + 1);
+                paginationButtonsContainer.appendChild(nextButton);
+            }
+        }
+
+        function updateOrderStatistics(orders) {
             const totalOrders = orders.length;
+            const pendingOrders = orders.filter(o => o.status === 'Pending').length;
             const processingOrders = orders.filter(o => o.status === 'Processing').length;
             const completedOrders = orders.filter(o => o.status === 'Done').length;
-            const totalRevenue = orders.reduce((sum, order) => sum + order.total_price, 0);
-            
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0); // Perbaikan: Gunakan totalPrice
+
             document.getElementById('total-orders').textContent = totalOrders;
             document.getElementById('processing-orders').textContent = processingOrders;
             document.getElementById('completed-orders').textContent = completedOrders;
             document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
         }
 
+        // Fungsi untuk memuat data pembayaran
+        async function loadPayments() {
+            try {
+                showLoading('payment-loading', true);
+
+                const response = await fetch(`${API_BASE_URL}/payments`); // Pastikan endpoint ini benar
+                if (!response.ok) {
+                    throw new Error('Gagal memuat data pembayaran');
+                }
+
+                const data = await response.json();
+
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal memuat data pembayaran');
+                }
+
+                displayPayments(data.data);
+                updatePaymentStatistics(data.data);
+
+            } catch (error) {
+                showError('payment-error', error.message);
+            } finally {
+                showLoading('payment-loading', false);
+            }
+        }
+
+        // Fungsi untuk menampilkan data pembayaran di tabel
+        function displayPayments(payments) {
+            const tbody = document.getElementById('payments-table-body');
+            if (!tbody) {
+                console.error('Tbody untuk pembayaran tidak ditemukan');
+                return;
+            }
+
+            tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
+
+            if (payments.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Tidak ada data pembayaran</td></tr>`;
+                return;
+            }
+
+            payments.forEach((payment, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-all duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${payment.order_id ?? 'Tidak ada data'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">Rp${payment.amount?.toLocaleString('id-ID') ?? '0'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-block px-2 py-1 text-xs font-semibold ${
+                                payment.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                            } rounded-full">
+                                ${payment.status === 'Pending' ? 'Pending' : 'Lunas'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">${payment.created_at ? new Date(payment.created_at).toLocaleDateString('id-ID') : '-'}</td>
+                    </tr>
+                `;
+            });
+            // Paginasi untuk pembayaran (jika diperlukan, bisa ditambahkan di sini)
+            // renderPagination(payments.length, 1, 'payment-pagination-buttons', 'payment-pagination-info');
+        }
+
+        // Fungsi untuk memperbarui statistik pembayaran
+        function updatePaymentStatistics(payments) {
+            const totalPayments = payments.length;
+            const pendingPayments = payments.filter(p => p.status === 'Pending').length;
+            const paidPayments = payments.filter(p => p.status === 'Paid').length;
+            const totalPaymentAmount = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+
+            document.getElementById('total-payments').textContent = totalPayments;
+            document.getElementById('pending-payments').textContent = pendingPayments;
+            document.getElementById('paid-payments').textContent = paidPayments;
+            document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
+        }
+
         async function editOrder(orderId) {
             try {
-                showLoading(true);
-                
+                showLoading('edit-modal', true); // Gunakan ID modal untuk loading
+
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
                 if (!response.ok) {
                     throw new Error('Gagal mengambil data pesanan');
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.status !== "success") {
                     throw new Error(data.message || 'Gagal mengambil data pesanan');
                 }
-                
-                showEditModal(data.data);
-                
-            } catch (error) {
-                showError(error.message);
-            } finally {
-                showLoading(false);
-            }
-        }
 
-        function showEditModal(order) {
-            const modal = document.getElementById('edit-modal');
-            document.getElementById('edit-order-id').value = order.id;
-            document.getElementById('edit-weight').value = order.weight;
-            document.getElementById('edit-price').value = order.total_price;
-            document.getElementById('edit-status').value = order.status;
-            
-            modal.classList.remove('hidden');
+                document.getElementById('edit-order-id').value = data.data.id;
+                document.getElementById('edit-weight').value = data.data.weight;
+                document.getElementById('edit-price').value = data.data.totalPrice; // Perbaikan: Gunakan totalPrice
+                document.getElementById('edit-status').value = data.data.status;
+
+                document.getElementById('edit-modal').classList.remove('hidden');
+
+            } catch (error) {
+                showError('error-alert', error.message); // Gunakan ID alert global
+            } finally {
+                showLoading('edit-modal', false);
+            }
         }
 
         async function handleEditOrder(e) {
             e.preventDefault();
-            
+
             const orderId = document.getElementById('edit-order-id').value;
             const weight = document.getElementById('edit-weight').value;
             const price = document.getElementById('edit-price').value;
             const status = document.getElementById('edit-status').value;
-            
+
             try {
-                showLoading(true);
-                
+                showLoading('edit-modal', true); // Gunakan ID modal untuk loading
+
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
                     method: 'PUT',
                     headers: {
@@ -338,29 +547,29 @@
                     },
                     body: JSON.stringify({
                         weight: parseFloat(weight),
-                        total_price: parseFloat(price),
+                        total_price: parseFloat(price), // Perbaikan: Kirim sebagai total_price ke backend
                         status
                     })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Gagal memperbarui pesanan');
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.status !== "success") {
                     throw new Error(data.message || 'Gagal memperbarui pesanan');
                 }
-                
+
                 document.getElementById('edit-modal').classList.add('hidden');
-                loadOrders();
+                loadOrders(); // Refresh order data
                 showSuccess('Pesanan berhasil diperbarui');
-                
+
             } catch (error) {
-                showError(error.message);
+                showError('error-alert', error.message); // Gunakan ID alert global
             } finally {
-                showLoading(false);
+                showLoading('edit-modal', false);
             }
         }
 
@@ -372,77 +581,96 @@
 
         async function deleteOrder(orderId) {
             try {
-                showLoading(true);
-                
+                showLoading('order-loading', true); // Gunakan ID loading spesifik
+
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
                     method: 'DELETE'
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('Gagal menghapus pesanan');
                 }
-                
+
                 const data = await response.json();
-                
+
                 if (data.status !== "success") {
                     throw new Error(data.message || 'Gagal menghapus pesanan');
                 }
-                
-                loadOrders();
+
+                loadOrders(); // Refresh order data
                 showSuccess('Pesanan berhasil dihapus');
-                
+
             } catch (error) {
-                showError(error.message);
+                showError('order-error', error.message); // Gunakan ID error spesifik
             } finally {
-                showLoading(false);
+                showLoading('order-loading', false);
             }
         }
 
-        function handleSearch(e) {
+        function handleSearchOrders(e) {
             const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#orders-table-body tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            const filteredOrders = allOrders.filter(order => {
+                const customerName = order.user ? order.user.name.toLowerCase() : '';
+                return (
+                    String(order.id).toLowerCase().includes(searchTerm) ||
+                    customerName.includes(searchTerm) ||
+                    String(order.weight).includes(searchTerm) ||
+                    String(order.totalPrice).includes(searchTerm) || // Perbaikan: Gunakan totalPrice
+                    order.status.toLowerCase().includes(searchTerm) ||
+                    (order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID').includes(searchTerm) : false) // Perbaikan: Gunakan createdAt
+                );
             });
+            currentPage = 1; // Reset halaman ke 1 saat pencarian
+            renderOrderTable(filteredOrders, currentPage);
+        }
+
+        function handleSearchPayments(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Implementasi pencarian pembayaran jika Anda memiliki allPayments array
+            // Untuk saat ini, ini hanya placeholder
+            console.log('Pencarian pembayaran:', searchTerm);
         }
 
         function logout() {
             localStorage.removeItem('authUser');
-            window.location.href = '../login.html';
+            window.location.href = '../login.html'; // Sesuaikan path jika perlu
         }
 
-        function showLoading(show) {
-            const loader = document.getElementById('loader');
-            if (!loader) return;
-            
+        // Fungsi untuk menampilkan loading (global atau spesifik)
+        function showLoading(elementId, show) {
+            const loaderElement = document.getElementById(elementId);
+            if (!loaderElement) return;
+
             if (show) {
-                loader.classList.remove('hidden');
+                loaderElement.classList.remove('hidden');
             } else {
-                loader.classList.add('hidden');
+                loaderElement.classList.add('hidden');
             }
         }
 
-        function showError(message) {
-            const errorAlert = document.getElementById('error-alert');
-            if (!errorAlert) return;
-            
-            errorAlert.textContent = message;
-            errorAlert.classList.remove('hidden');
-            
+        // Fungsi untuk menampilkan error (global atau spesifik)
+        function showError(elementId, message) {
+            const alertElement = document.getElementById(elementId);
+            const messageSpan = alertElement.querySelector('span');
+            if (!alertElement || !messageSpan) return;
+
+            messageSpan.textContent = message;
+            alertElement.classList.remove('hidden');
+
             setTimeout(() => {
-                errorAlert.classList.add('hidden');
+                alertElement.classList.add('hidden');
             }, 5000);
         }
 
+        // Fungsi untuk menampilkan sukses (global)
         function showSuccess(message) {
             const successAlert = document.getElementById('success-alert');
-            if (!successAlert) return;
-            
-            successAlert.textContent = message;
+            const messageSpan = successAlert.querySelector('span');
+            if (!successAlert || !messageSpan) return;
+
+            messageSpan.textContent = message;
             successAlert.classList.remove('hidden');
-            
+
             setTimeout(() => {
                 successAlert.classList.add('hidden');
             }, 3000);

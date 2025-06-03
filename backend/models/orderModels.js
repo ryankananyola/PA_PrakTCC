@@ -23,6 +23,11 @@ const Order = db.define("order", {
             min: 0.1 // Minimum berat 0.1 kg
         }
     },
+    service_type: {
+    type: Sequelize.ENUM("Regular", "Express", "Premium"),
+    defaultValue: 'Regular',
+    allowNull: false
+},
     total_price: {
         type: Sequelize.FLOAT,
         allowNull: false,

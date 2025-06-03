@@ -68,13 +68,14 @@ export const getOrderById = async (req, res) => {
 // CREATE ORDER
 export const createOrder = async (req, res) => {
     try {
-        const { user_id, weight, total_price } = req.body;
+        const { user_id, weight, total_price, service_type } = req.body;
         
         const order = await Order.create({
-            user_id,
-            weight,
-            total_price
-        });
+    user_id,
+    weight,
+    total_price,
+    service_type
+});
         
         res.status(201).json({ 
             status: "success",

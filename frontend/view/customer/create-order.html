@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Pesanan Baru - LaundryRR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div id="app">
+        <!-- Konten akan dimuat oleh JavaScript -->
+        <div class="flex justify-center items-center h-screen">
+            <p class="text-lg">Memuat halaman...</p>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loader" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <!-- Alerts -->
+    <div id="error-alert" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden" role="alert"></div>
+    <div id="success-alert" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden" role="alert"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cek session user
+            checkAuth();
+            
+            // Event listeners
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'logoutBtn') {
+                    logout();
+                }
+            });
+            
+            document.getElementById('order-form')?.addEventListener('submit', handleCreateOrder);
+        });
+
+        function checkAuth() {
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            if (!authUser) {
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            renderPage(authUser);
+        }
+
+        function renderPage(user) {
+            const app = document.getElementById('app');
+            
+            app.innerHTML = `
+                <nav class="bg-blue-600 text-white p-4">
+                    <div class="container mx-auto flex justify-between">
+                        <h1 class="text-xl font-bold">LaundryRR - Buat Pesanan Baru</h1>
+                        <div class="flex items-center space-x-4">
+                            <span>Halo, ${user.name}</span>
+                            <button id="logoutBtn" class="bg-red-500 px-4 py-1 rounded">
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+                
+                <main class="container mx-auto p-4">
+                    <div class="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">Formulir Pesanan Baru</h2>
+                            <a href="dashboard-customer.html" class="text-blue-600 hover:text-blue-800 flex items-center">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+                            </a>
+                        </div>
+                        
+                        <form id="order-form">
+                            <div class="mb-4">
+                                <label for="weight" class="block text-gray-700 mb-2">Berat Laundry (kg)</label>
+                                <input type="number" id="weight" name="weight" 
+                                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    step="0.1" min="0.1" required>
+                                <p class="text-sm text-gray-500 mt-1">Minimal 0.1 kg</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="price" class="block text-gray-700 mb-2">Total Harga (Rp)</label>
+                                <input type="number" id="price" name="price" 
+                                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    min="0" required>
+                                <p class="text-sm text-gray-500 mt-1">Harga akan dihitung otomatis</p>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 mb-2">Jenis Layanan</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="border rounded-md p-4 hover:bg-blue-50 cursor-pointer">
+                                        <input type="radio" id="regular" name="service_type" value="Regular" class="hidden" checked>
+                                        <label for="regular" class="flex flex-col items-center">
+                                            <i class="fas fa-tshirt text-2xl text-blue-600 mb-2"></i>
+                                            <span class="font-medium">Regular</span>
+                                            <span class="text-sm text-gray-500">Rp10,000/kg</span>
+                                        </label>
+                                    </div>
+                                    <div class="border rounded-md p-4 hover:bg-blue-50 cursor-pointer">
+                                        <input type="radio" id="express" name="service_type" value="Express" class="hidden">
+                                        <label for="express" class="flex flex-col items-center">
+                                            <i class="fas fa-bolt text-2xl text-yellow-600 mb-2"></i>
+                                            <span class="font-medium">Express</span>
+                                            <span class="text-sm text-gray-500">Rp15,000/kg</span>
+                                        </label>
+                                    </div>
+                                    <div class="border rounded-md p-4 hover:bg-blue-50 cursor-pointer">
+                                        <input type="radio" id="premium" name="service_type" value="Premium" class="hidden">
+                                        <label for="premium" class="flex flex-col items-center">
+                                            <i class="fas fa-crown text-2xl text-purple-600 mb-2"></i>
+                                            <span class="font-medium">Premium</span>
+                                            <span class="text-sm text-gray-500">Rp20,000/kg</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <button type="reset" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+                                    Reset Form
+                                </button>
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center">
+                                    <i class="fas fa-paper-plane mr-2"></i> Buat Pesanan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            `;
+
+            // Add event listeners for auto-calculate price
+            document.getElementById('weight').addEventListener('input', calculatePrice);
+            document.querySelectorAll('input[name="service_type"]').forEach(radio => {
+                radio.addEventListener('change', calculatePrice);
+            });
+        }
+
+        function calculatePrice() {
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const serviceType = document.querySelector('input[name="service_type"]:checked').value;
+            
+            let pricePerKg = 10000; // Regular
+            if (serviceType === 'Express') pricePerKg = 15000;
+            if (serviceType === 'Premium') pricePerKg = 20000;
+            
+            const totalPrice = weight * pricePerKg;
+            document.getElementById('price').value = totalPrice;
+        }
+
+        async function handleCreateOrder(e) {
+            e.preventDefault();
+            
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            if (!authUser) {
+                showError('Silakan login kembali');
+                return;
+            }
+            
+            const weight = document.getElementById('weight').value;
+            const price = document.getElementById('price').value;
+            const serviceType = document.querySelector('input[name="service_type"]:checked').value;
+            
+            try {
+                showLoading(true);
+                
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: authUser.id,
+                        weight: parseFloat(weight),
+                        total_price: parseFloat(price),
+                        status: 'Pending',
+                        service_type: serviceType
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Gagal membuat pesanan');
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== "success") {
+                    throw new Error(data.message || 'Gagal membuat pesanan');
+                }
+                
+                showSuccess('Pesanan berhasil dibuat!');
+                setTimeout(() => {
+                    window.location.href = 'dashboard-customer.html';
+                }, 1500);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authUser');
+            window.location.href = '../login.html';
+        }
+
+        function showLoading(show) {
+            const loader = document.getElementById('loader');
+            if (!loader) return;
+            
+            if (show) {
+                loader.classList.remove('hidden');
+            } else {
+                loader.classList.add('hidden');
+            }
+        }
+
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            if (!errorAlert) return;
+            
+            errorAlert.textContent = message;
+            errorAlert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorAlert.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successAlert = document.getElementById('success-alert');
+            if (!successAlert) return;
+            
+            successAlert.textContent = message;
+            successAlert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                successAlert.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
