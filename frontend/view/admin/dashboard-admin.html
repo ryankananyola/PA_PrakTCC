@@ -65,7 +65,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-white shadow-sm rounded-md p-4">
                 <div class="text-gray-500 font-semibold text-sm mb-1">Total Pembayaran</div>
                 <div class="text-2xl font-bold text-teal-600" id="total-payments">0</div>
@@ -81,7 +81,7 @@
                 <div class="text-gray-500 font-semibold text-sm mb-1">Total Jumlah Dibayar</div>
                 <div class="text-2xl font-bold text-cyan-600" id="total-payment-amount">Rp0</div>
             </div>
-        </div>
+        </div> -->
 
         <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
             <div class="flex items-center justify-between p-6 border-b">
@@ -130,18 +130,18 @@
             </div>
             <div id="payment-error" class="hidden text-red-500 mb-2"></div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Order</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                <table class="table-auto w-full">
+                    <thead>
+                        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">ID</th>
+                        <th class="py-3 px-6 text-left">Order ID</th>
+                        <th class="py-3 px-6 text-left">Jumlah</th>
+                        <th class="py-3 px-6 text-left">Status</th>
+                        <th class="py-3 px-6 text-left">Tanggal</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" id="payments-table-body">
-                        <tr><td colspan="5" class="text-center py-4">Memuat data pembayaran...</td></tr>
+                    <tbody id="payments-table-body" class="text-gray-600 text-sm font-light">
+                        <!-- Data pembayaran akan ditambahkan lewat JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -326,75 +326,68 @@
         // Fungsi untuk memuat data pembayaran
         async function loadPayments() {
             try {
-                showLoading('payment-loading', true);
-
-                const response = await fetch(`${API_BASE_URL}/payments`); // Pastikan endpoint ini benar
-                if (!response.ok) {
-                    throw new Error('Gagal memuat data pembayaran');
-                }
-
+                const response = await fetch(`${API_BASE_URL}/payments`);
                 const data = await response.json();
+                console.log("RESPON API:", data);
 
-                if (data.status !== "success") {
-                    throw new Error(data.message || 'Gagal memuat data pembayaran');
+                // data langsung berupa array
+                if (Array.isArray(data)) {
+                    displayPayments(data);  // langsung kirim array ke displayPayments
+                } else {
+                    console.error("Format data pembayaran tidak sesuai:", data);
                 }
-
-                displayPayments(data.data);
-                updatePaymentStatistics(data.data);
-
             } catch (error) {
-                showError('payment-error', error.message);
-            } finally {
-                showLoading('payment-loading', false);
+                console.error("Error saat memuat pembayaran:", error);
             }
         }
+
+
 
         // Fungsi untuk menampilkan data pembayaran di tabel
         function displayPayments(payments) {
-            const tbody = document.getElementById('payments-table-body');
-            if (!tbody) {
-                console.error('Tbody untuk pembayaran tidak ditemukan');
+            const paymentsTableBody = document.getElementById("payments-table-body");
+            paymentsTableBody.innerHTML = "";
+
+            if (!payments || payments.length === 0) {
+                paymentsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-gray-500">Tidak ada data pembayaran</td>
+                </tr>`;
                 return;
             }
 
-            tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
+            payments.forEach(payment => {
+                const row = document.createElement("tr");
+                row.classList.add("border-b", "border-gray-200", "hover:bg-gray-100");
 
-            if (payments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Tidak ada data pembayaran</td></tr>`;
-                return;
-            }
-
-            payments.forEach((payment, index) => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.order_id ?? 'Tidak ada data'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">Rp${payment.amount?.toLocaleString('id-ID') ?? '0'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                                payment.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                            } rounded-full">
-                                ${payment.status === 'Pending' ? 'Pending' : 'Lunas'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.created_at ? new Date(payment.created_at).toLocaleDateString('id-ID') : '-'}</td>
-                    </tr>
+                row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${payment.order_id}</td>
+                <td class="px-6 py-4 whitespace-nowrap">Rp${(payment.amount ?? 0).toLocaleString('id-ID')}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${payment.status ? 'Lunas' : 'Pending'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${new Date(payment.payment_date).toLocaleString("id-ID")}</td>
                 `;
+
+                paymentsTableBody.appendChild(row);
             });
         }
+
 
         // Fungsi untuk memperbarui statistik pembayaran
         function updatePaymentStatistics(payments) {
             const totalPayments = payments.length;
-            const pendingPayments = payments.filter(p => p.status === 'Pending').length;
-            const paidPayments = payments.filter(p => p.status === 'Paid').length; // Corrected filter
-            const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+            const pendingPayments = payments.filter(p => p.status === false).length;
+            const completedPayments = payments.filter(p => p.status === true).length;
+            const totalPaymentAmount = payments
+                .filter(p => p.status === true)
+                .reduce((sum, p) => sum + Number(p.amount || 0), 0);
 
             document.getElementById('total-payments').textContent = totalPayments;
             document.getElementById('pending-payments').textContent = pendingPayments;
-            document.getElementById('paid-payments').textContent = paidPayments; // Corrected ID
+            document.getElementById('completed-payments').textContent = completedPayments;
             document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
         }
+
 
         // Fungsi untuk edit order
         async function editOrder(orderId) {

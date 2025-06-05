@@ -115,8 +115,11 @@ function updateOrderStatistics(orders) {
     const totalOrders = orders.length;
     const pendingOrders = orders.filter(o => o.status === 'Pending').length;
     const processingOrders = orders.filter(o => o.status === 'Processing').length;
-    const completedOrders = orders.filter(o => o.status === 'Done').length;
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total_price, 0);
+    const completedOrders = orders.filter(o => o.status === 'Done' || o.status === 'Selesai').length;
+
+    const totalRevenue = orders
+        .filter(order => (order.status === 'Done' || order.status === 'Selesai') && order.total_price)
+        .reduce((sum, order) => sum + parseFloat(order.total_price), 0);
 
     document.getElementById('total-orders').textContent = totalOrders;
     document.getElementById('processing-orders').textContent = processingOrders;
@@ -124,78 +127,75 @@ function updateOrderStatistics(orders) {
     document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
 }
 
+
 // Fungsi untuk memuat data pembayaran
 async function loadPayments() {
     try {
-        showLoading('payment-loading', true);
-
-        const response = await fetch(`${API_BASE_URL}/payments`); // Pastikan endpoint ini benar
-        if (!response.ok) {
-            throw new Error('Gagal memuat data pembayaran');
-        }
-
+        const response = await fetch(`${API_BASE_URL}/payments`);
         const data = await response.json();
+        console.log("RESPON API:", data);
 
-        if (data.status !== "success") {
-            throw new Error(data.message || 'Gagal memuat data pembayaran');
+        // data langsung berupa array
+        if (Array.isArray(data)) {
+            displayPayments(data);  // langsung kirim array ke displayPayments
+        } else {
+            console.error("Format data pembayaran tidak sesuai:", data);
         }
-
-        displayPayments(data.data);
-        updatePaymentStatistics(data.data);
-
     } catch (error) {
-        showError('payment-error', error.message);
-    } finally {
-        showLoading('payment-loading', false);
+        console.error("Error saat memuat pembayaran:", error);
     }
 }
+
+
 
 // Fungsi untuk menampilkan data pembayaran di tabel
 function displayPayments(payments) {
-    const tbody = document.getElementById('payments-table-body');
-    if (!tbody) {
-        console.error('Tbody untuk pembayaran tidak ditemukan');
-        return;
-    }
+  const paymentsTableBody = document.getElementById("payments-table-body");
+  paymentsTableBody.innerHTML = "";
 
-    tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
+  if (!payments || payments.length === 0) {
+    paymentsTableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="text-center py-4 text-gray-500">Tidak ada data pembayaran</td>
+      </tr>`;
+    return;
+  }
 
-    if (payments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Tidak ada data pembayaran</td></tr>`;
-        return;
-    }
+  payments.forEach(payment => {
+    const row = document.createElement("tr");
+    row.classList.add("border-b", "border-gray-200", "hover:bg-gray-100");
 
-    payments.forEach((payment, index) => {
-        tbody.innerHTML += `
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap">${index + 1}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${payment.order_id ?? 'Tidak ada data'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">Rp${payment.amount?.toLocaleString('id-ID') ?? '0'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                        payment.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                    } rounded-full">
-                        ${payment.status === 'Pending' ? 'Pending' : 'Lunas'}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">${payment.created_at ? new Date(payment.created_at).toLocaleDateString('id-ID') : '-'}</td>
-            </tr>
-        `;
-    });
+    row.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
+      <td class="px-6 py-4 whitespace-nowrap">${payment.order_id}</td>
+      <td class="px-6 py-4 whitespace-nowrap">Rp${(payment.amount ?? 0).toLocaleString('id-ID')}</td>
+      <td class="px-6 py-4 whitespace-nowrap">${payment.status ? 'Lunas' : 'Pending'}</td>
+      <td class="px-6 py-4 whitespace-nowrap">${new Date(payment.payment_date).toLocaleString("id-ID")}</td>
+    `;
+
+    paymentsTableBody.appendChild(row);
+  });
 }
+
+
 
 // Fungsi untuk memperbarui statistik pembayaran
 function updatePaymentStatistics(payments) {
-    const totalPayments = payments.length;
-    const pendingPayments = payments.filter(p => p.status === 'Pending').length;
-    const completedPayments = payments.filter(p => p.status === 'Paid').length;
-    const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+  const totalPayments = payments.length;
+  const pendingPayments = payments.filter(p => p.status === false).length;
+  const completedPayments = payments.filter(p => p.status === true).length;
+  const totalPaymentAmount = payments
+    .filter(p => p.status === true)
+    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
 
-    document.getElementById('total-payments').textContent = totalPayments;
-    document.getElementById('pending-payments').textContent = pendingPayments;
-    document.getElementById('completed-payments').textContent = completedPayments;
-    document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
+  document.getElementById('total-payments').textContent = totalPayments;
+  document.getElementById('pending-payments').textContent = pendingPayments;
+  document.getElementById('completed-payments').textContent = completedPayments;
+  document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
 }
+
+
+
 
 // Fungsi untuk edit order
 async function editOrder(orderId) {

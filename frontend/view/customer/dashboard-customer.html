@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - LaundryRR</title>
+    <title>Dashboard Customer - LaundryRR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -177,30 +177,23 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-300">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-500 font-semibold">Total Pendapatan Order</p>
-                                    <h3 class="text-2xl font-bold text-indigo-600" id="total-revenue">Rp0</h3>
-                                </div>
-                                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                                    <i class="fas fa-money-bill-wave fa-lg"></i>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
 
                     <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
-                        <div class="px-6 py-4 border-b bg-gray-50">
-                            <div class="flex justify-between items-center">
-                                <h2 class="text-lg font-semibold text-gray-700">Daftar Pesanan</h2>
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-lg font-semibold text-gray-700">Daftar Pesanan</h2>
+                            <div class="flex items-center space-x-4">
                                 <div class="relative">
                                     <input type="text" id="search-input-order" placeholder="Cari pesanan..."
-                                           class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                        class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-search text-gray-400"></i>
                                     </div>
                                 </div>
+                                <a href="create-order.html" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200">
+                                    <i class="fas fa-plus mr-2"></i>Tambah Pesanan
+                                </a>
                             </div>
                         </div>
                         <div id="order-loading" class="hidden flex justify-center py-4">
@@ -228,46 +221,6 @@
                         <div class="px-6 py-3 bg-gray-50 flex justify-between items-center" id="pagination-container">
                             <p class="text-sm text-gray-700" id="pagination-info"></p>
                             <div class="space-x-2" id="pagination-buttons">
-                                </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div class="px-6 py-4 border-b bg-gray-50">
-                            <div class="flex justify-between items-center">
-                                <h2 class="text-lg font-semibold text-gray-700">Daftar Pembayaran</h2>
-                                <div class="relative">
-                                    <input type="text" id="search-input-payment" placeholder="Cari pembayaran..."
-                                           class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="payment-loading" class="hidden flex justify-center py-4">
-                            <div class="loading-spinner"></div>
-                        </div>
-                        <div id="payment-error" class="hidden text-red-500 mb-2"></div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Order</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="payments-table-body">
-                                    <tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Memuat data pembayaran...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="px-6 py-3 bg-gray-50 flex justify-between items-center" id="payment-pagination-container">
-                            <p class="text-sm text-gray-700" id="payment-pagination-info"></p>
-                            <div class="space-x-2" id="payment-pagination-buttons">
                                 </div>
                         </div>
                     </div>
@@ -343,14 +296,9 @@
                             order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID') : '-'}</td>
                     <td class="px-6 py-4 whitespace-nowrap flex space-x-2">
-                        <button class="edit-btn text-blue-500 hover:text-blue-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="delete-btn text-red-500 hover:text-red-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Hapus">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        
                         ${currentUserId === order.user.id ? // Perbaikan: Gunakan order.user.id
                             `<button class="pay-btn text-purple-500 hover:text-purple-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Bayar">
                                 <i class="fas fa-credit-card"></i>
@@ -417,87 +365,12 @@
             const pendingOrders = orders.filter(o => o.status === 'Pending').length;
             const processingOrders = orders.filter(o => o.status === 'Processing').length;
             const completedOrders = orders.filter(o => o.status === 'Done').length;
-            const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0); // Perbaikan: Gunakan totalPrice
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
 
             document.getElementById('total-orders').textContent = totalOrders;
             document.getElementById('processing-orders').textContent = processingOrders;
             document.getElementById('completed-orders').textContent = completedOrders;
             document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
-        }
-
-        // Fungsi untuk memuat data pembayaran
-        async function loadPayments() {
-            try {
-                showLoading('payment-loading', true);
-
-                const response = await fetch(`${API_BASE_URL}/payments`); // Pastikan endpoint ini benar
-                if (!response.ok) {
-                    throw new Error('Gagal memuat data pembayaran');
-                }
-
-                const data = await response.json();
-
-                if (data.status !== "success") {
-                    throw new Error(data.message || 'Gagal memuat data pembayaran');
-                }
-
-                displayPayments(data.data);
-                updatePaymentStatistics(data.data);
-
-            } catch (error) {
-                showError('payment-error', error.message);
-            } finally {
-                showLoading('payment-loading', false);
-            }
-        }
-
-        // Fungsi untuk menampilkan data pembayaran di tabel
-        function displayPayments(payments) {
-            const tbody = document.getElementById('payments-table-body');
-            if (!tbody) {
-                console.error('Tbody untuk pembayaran tidak ditemukan');
-                return;
-            }
-
-            tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
-
-            if (payments.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Tidak ada data pembayaran</td></tr>`;
-                return;
-            }
-
-            payments.forEach((payment, index) => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition-all duration-200">
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.order_id ?? 'Tidak ada data'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">Rp${payment.amount?.toLocaleString('id-ID') ?? '0'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                                payment.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                            } rounded-full">
-                                ${payment.status === 'Pending' ? 'Pending' : 'Lunas'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">${payment.created_at ? new Date(payment.created_at).toLocaleDateString('id-ID') : '-'}</td>
-                    </tr>
-                `;
-            });
-            // Paginasi untuk pembayaran (jika diperlukan, bisa ditambahkan di sini)
-            // renderPagination(payments.length, 1, 'payment-pagination-buttons', 'payment-pagination-info');
-        }
-
-        // Fungsi untuk memperbarui statistik pembayaran
-        function updatePaymentStatistics(payments) {
-            const totalPayments = payments.length;
-            const pendingPayments = payments.filter(p => p.status === 'Pending').length;
-            const paidPayments = payments.filter(p => p.status === 'Paid').length;
-            const totalPaymentAmount = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
-
-            document.getElementById('total-payments').textContent = totalPayments;
-            document.getElementById('pending-payments').textContent = pendingPayments;
-            document.getElementById('paid-payments').textContent = paidPayments;
-            document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
         }
 
         async function editOrder(orderId) {
@@ -573,39 +446,39 @@
             }
         }
 
-        function confirmDelete(orderId) {
-            if (confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
-                deleteOrder(orderId);
-            }
-        }
+        // function confirmDelete(orderId) {
+        //     if (confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
+        //         deleteOrder(orderId);
+        //     }
+        // }
 
-        async function deleteOrder(orderId) {
-            try {
-                showLoading('order-loading', true); // Gunakan ID loading spesifik
+        // async function deleteOrder(orderId) {
+        //     try {
+        //         showLoading('order-loading', true); // Gunakan ID loading spesifik
 
-                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-                    method: 'DELETE'
-                });
+        //         const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        //             method: 'DELETE'
+        //         });
 
-                if (!response.ok) {
-                    throw new Error('Gagal menghapus pesanan');
-                }
+        //         if (!response.ok) {
+        //             throw new Error('Gagal menghapus pesanan');
+        //         }
 
-                const data = await response.json();
+        //         const data = await response.json();
 
-                if (data.status !== "success") {
-                    throw new Error(data.message || 'Gagal menghapus pesanan');
-                }
+        //         if (data.status !== "success") {
+        //             throw new Error(data.message || 'Gagal menghapus pesanan');
+        //         }
 
-                loadOrders(); // Refresh order data
-                showSuccess('Pesanan berhasil dihapus');
+        //         loadOrders(); // Refresh order data
+        //         showSuccess('Pesanan berhasil dihapus');
 
-            } catch (error) {
-                showError('order-error', error.message); // Gunakan ID error spesifik
-            } finally {
-                showLoading('order-loading', false);
-            }
-        }
+        //     } catch (error) {
+        //         showError('order-error', error.message); // Gunakan ID error spesifik
+        //     } finally {
+        //         showLoading('order-loading', false);
+        //     }
+        // }
 
         function handleSearchOrders(e) {
             const searchTerm = e.target.value.toLowerCase();

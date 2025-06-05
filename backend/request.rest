@@ -1,13 +1,16 @@
 GET http://localhost:3000/users
 
 ###
+GET http://localhost:3000/payments/
+
+###
 POST http://localhost:3000/add-users
 Content-Type: application/json
 
 {
-    "name": "user",
-    "email": "user@gmail.com",
-    "password": "user123",
+    "name": "RyanKNy",
+    "email": "ian1@gmail.com",
+    "password": "tccbabik",
     "noHP": "00123220198",
     "role": "user"
 }
