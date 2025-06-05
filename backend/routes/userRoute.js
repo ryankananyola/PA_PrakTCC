@@ -7,18 +7,20 @@ import {
     deleteUser,
     registerUser,
     loginUser,
-    verifyToken
 } from "../controller/userController.js";
+import { verifyToken } from "../middleware/verifyToken.js";
+import { generateAccessToken } from "../controller/tokenController.js";
 
 const router = express.Router();
 
-router.get("/users/", getUsers);
-router.get("/users/:id", getUserById);
+router.get("/token", generateAccessToken);
+
+router.get("/users/", verifyToken, getUsers);
+router.get("/users/:id", verifyToken, getUserById);
 router.post("/add-users", createUser);
 router.post("/users/login", loginUser);
-router.get("/users/verify", verifyToken);
-router.put("/user/:id", updateUser);
-router.delete("/user/:id", deleteUser);
+router.put("/user/:id", verifyToken, updateUser);
+router.delete("/user/:id", verifyToken, deleteUser);
 router.post("/users/register", registerUser);
 
 export default router;

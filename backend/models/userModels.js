@@ -31,16 +31,20 @@ const User = db.define('users', {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'customer'
+    },
+    refresh_token: {
+        type: DataTypes.TEXT,
+        allowNull: true
     }
 }, {
     freezeTableName: true,
-    timestamps: true // Pastikan ini true untuk createdAt/updatedAt
+    timestamps: true // Aktifkan createdAt & updatedAt otomatis
 });
 
 // Sinkronisasi model dengan database
 (async () => {
     try {
-        await db.sync({ force: false }); // force: false agar tidak drop tabel yang ada
+        await db.sync({ force: false });
         console.log('Tabel users siap digunakan');
     } catch (error) {
         console.error('Gagal sinkronisasi tabel users:', error);

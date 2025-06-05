@@ -9,10 +9,10 @@ Content-Type: application/json
 
 {
     "name": "RyanKNy",
-    "email": "ian1@gmail.com",
+    "email": "admin2@gmail.com",
     "password": "tccbabik",
     "noHP": "00123220198",
-    "role": "user"
+    "role": "admin"
 }
 
 ###

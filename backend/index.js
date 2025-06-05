@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import userRoute from "./routes/userRoute.js";
 import orderRoute from "./routes/orderRoute.js"
 import paymentRoute from "./routes/paymentRoute.js"
@@ -14,10 +15,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-
-
-// Middleware untuk parsing JSON
 app.use(express.json());
+app.use(cookieParser());
 
 // Test endpoint
 app.get('/', (req, res) => {
