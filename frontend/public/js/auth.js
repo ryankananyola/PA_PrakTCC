@@ -3,13 +3,14 @@ const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 menit
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const rememberMeCheckbox = document.getElementById('rememberMe');
-            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+            const rememberMe = document.getElementById('rememberMe')?.checked || false;
             const loginBtn = document.getElementById('loginBtn');
             const errorMsg = document.getElementById('errorMsg');
 
@@ -27,10 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/users/login`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
+
                 const result = await response.json();
+                console.log('Login result:', result); // Debugging
 
                 if (!response.ok) {
                     throw new Error(result.message || 'Login gagal');
@@ -53,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('sessionData', sessionPayload);
                 }
 
-                redirectBasedOnRole(result.data.role);
+                handleSuccessfulLogin(result.data);
 
             } catch (err) {
                 showError(err.message || 'Terjadi kesalahan saat login', errorMsg);
@@ -63,10 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check existing session
     checkSession();
 
-    // Toggle password visibility
     const togglePasswordBtn = document.getElementById('togglePassword');
     if (togglePasswordBtn) {
         togglePasswordBtn.addEventListener('click', () => {
@@ -97,37 +98,40 @@ function showError(message, errorElement) {
 }
 
 function setLoadingState(isLoading, button) {
-    if (isLoading) {
-        button.disabled = true;
-        button.querySelector('#loginText').classList.add('hidden');
-        button.querySelector('#loginSpinner').classList.remove('hidden');
-    } else {
-        button.disabled = false;
-        button.querySelector('#loginText').classList.remove('hidden');
-        button.querySelector('#loginSpinner').classList.add('hidden');
+    if (!button) return;
+    const loginText = button.querySelector('#loginText');
+    const loginSpinner = button.querySelector('#loginSpinner');
+
+    button.disabled = isLoading;
+    if (loginText && loginSpinner) {
+        loginText.classList.toggle('hidden', isLoading);
+        loginSpinner.classList.toggle('hidden', !isLoading);
     }
 }
 
 function checkSession() {
-    let sessionData = localStorage.getItem('sessionData') || sessionStorage.getItem('sessionData');
+    const sessionData = localStorage.getItem('sessionData') || sessionStorage.getItem('sessionData');
 
     if (sessionData) {
         try {
             const { user, timestamp, rememberMe } = JSON.parse(sessionData);
 
             if (!rememberMe && (Date.now() - timestamp > SESSION_TIMEOUT)) {
-                // Session expired
-                if (rememberMe) localStorage.removeItem('sessionData');
-                else sessionStorage.removeItem('sessionData');
+                if (rememberMe) {
+                    localStorage.removeItem('sessionData');
+                } else {
+                    sessionStorage.removeItem('sessionData');
+                }
                 return;
             }
 
-            // Cek jika saat ini bukan di halaman login
+            // Hanya redirect otomatis jika bukan di login page
             if (!window.location.pathname.includes('login.html')) {
                 redirectBasedOnRole(user.role);
             }
 
-        } catch {
+        } catch (err) {
+            console.error("Session parsing error:", err);
             localStorage.removeItem('sessionData');
             sessionStorage.removeItem('sessionData');
         }
@@ -137,19 +141,35 @@ function checkSession() {
 function redirectBasedOnRole(role) {
     role = role.toLowerCase();
 
+    console.log('Redirecting for role:', role); // Debug penting
+
     if (role === 'admin') {
-        window.location.href = './admin/dashboard-admin.html';
+        window.location.href = 'admin/dashboard-admin.html';
     } else if (role === 'customer') {
-        window.location.href = './customer/dashboard-customer.html';
+        window.location.href = 'customer/dashboard-customer.html';
     } else {
         console.warn('Role tidak dikenal:', role);
-        window.location.href = './login.html';
+        window.location.href = 'login.html';
     }
 }
 
 
 
-// Bersihkan session jika browser ditutup (kecuali rememberMe aktif)
+function handleSuccessfulLogin(userData) {
+    console.log('Login sukses, user data:', userData); // Debugging
+
+    localStorage.setItem('authUser', JSON.stringify({
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        phone: userData.noHP || userData.phone,
+        role: userData.role
+    }));
+
+    redirectBasedOnRole(userData.role);
+}
+
+// Hapus session jika browser ditutup (kecuali rememberMe aktif)
 window.addEventListener('beforeunload', () => {
     const sessionData = localStorage.getItem('sessionData');
     if (sessionData) {
@@ -161,19 +181,3 @@ window.addEventListener('beforeunload', () => {
         }
     }
 });
-
-function handleSuccessfulLogin(userData) {
-    console.log('Login sukses, user data:', userData);  // Debug: tampilkan data user
-
-    localStorage.setItem('authUser', JSON.stringify({
-        id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        phone: userData.noHP || userData.phone,
-        role: userData.role
-    }));
-
-    // Pastikan role lowercase agar cocok
-    redirectBasedOnRole(userData.role.toLowerCase());
-}
-
