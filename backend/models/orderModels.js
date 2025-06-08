@@ -40,6 +40,12 @@ const Order = db.define("order", {
         defaultValue: 'Pending', // Default status Pending
         allowNull: false
     },
+    isPaid: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+
     created_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
@@ -61,5 +67,14 @@ Order.belongsTo(User, {
     as: "user",
     onDelete: 'CASCADE' // Optional: hapus order jika user dihapus
 });
+
+(async () => {
+  try {
+    await db.sync({ alter: true }); // Alter akan menambahkan kolom tanpa hapus data
+    console.log('Tabel orders sudah sinkron dengan model (kolom isPaid ditambahkan jika belum ada)');
+  } catch (error) {
+    console.error('Gagal sinkronisasi tabel orders:', error);
+  }
+})();
 
 export default Order;

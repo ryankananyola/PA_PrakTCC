@@ -104,11 +104,13 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Pesanan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Bayar</th> 
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody class="bg-white divide-y divide-gray-200" id="orders-table-body">
                         <tr><td colspan="7" class="text-center py-4">Memuat data pesanan...</td></tr>
                     </tbody>
@@ -196,7 +198,7 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:3000';
+        const API_BASE_URL = 'http://localhost:3000/api';
 
         document.addEventListener('DOMContentLoaded', function() {
             // Cek autentikasi admin
@@ -275,14 +277,41 @@
                 return;
             }
 
-            tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
+            tbody.innerHTML = ''; // Bersihkan isi tabel sebelumnya
 
             if (orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Tidak ada data pesanan</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4">Tidak ada data pesanan</td></tr>`;
                 return;
             }
 
-            orders.forEach((order, index) => {
+            orders.forEach((order) => {
+                // Tentukan warna dan label status
+                let statusClass = '';
+                let statusLabel = '';
+
+                switch (order.status) {
+                    case 'Pending':
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        statusLabel = 'Pending';
+                        break;
+                    case 'Processing':
+                        statusClass = 'bg-blue-100 text-blue-800';
+                        statusLabel = 'Dalam Proses';
+                        break;
+                    case 'Done':
+                    case 'Selesai':
+                        statusClass = 'bg-green-100 text-green-800';
+                        statusLabel = 'Selesai';
+                        break;
+                    default:
+                        statusClass = 'bg-gray-100 text-gray-800';
+                        statusLabel = order.status || '-';
+                }
+
+                // Status pembayaran
+                const paymentStatus = order.isPaid ? 'Lunas' : 'Belum Dibayar';
+                const paymentClass = order.isPaid ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
@@ -290,19 +319,21 @@
                         <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
                         <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price?.toLocaleString('id-ID') ?? '0'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                                order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                order.status === 'Processing' ? 'bg-blue-100 text-blue-800' :
-                                'bg-green-100 text-green-800'
-                            } rounded-full">
-                                ${order.status === 'Pending' ? 'Pending' :
-                                order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
+                            <span class="inline-block px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">
+                                ${statusLabel}
                             </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="${paymentClass}">${paymentStatus}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">${order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID') : '-'}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <button data-id="${order.id}" class="edit-btn text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button>
-                            <button data-id="${order.id}" class="delete-btn text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                            <button data-id="${order.id}" class="edit-btn text-blue-500 hover:text-blue-700 mr-2">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button data-id="${order.id}" class="delete-btn text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 `;

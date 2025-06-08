@@ -9,7 +9,7 @@ Content-Type: application/json
 
 {
     "name": "RyanKNy",
-    "email": "admin2@gmail.com",
+    "email": "admin3@gmail.com",
     "password": "tccbabik",
     "noHP": "00123220198",
     "role": "admin"
@@ -95,3 +95,97 @@ Content-Type: application/json
     "noHP": "00123220198",
     "role": "user"
 }
+
+// Ini Terbaru
+###
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "RyanKanaNyola",
+  "email": "ryankny@gmail.com",
+  "password": "123220198",
+  "confirmPassword": "123220198",
+  "noHP": "081234567890",
+  "role": "admin"
+}
+
+###
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "RyanKanaNyola",
+  "email": "ayudya@gmail.com",
+  "password": "ryan123220198",
+  "confirmPassword": "ryan123220198",
+  "noHP": "081234567890",
+  "role": "admin"
+}
+
+###
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "RyanKNy",
+  "email": "rkn@gmail.com",
+  "password": "123220198",
+  "confirmPassword": "123220198",
+  "noHP": "081234567890"
+}
+
+###
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+
+{
+  "user_id": 8,
+  "weight": 3.5,
+  "service_type": "Express",
+  "total_price": 150000,
+  "status": "Pending",
+  "isPaid": false
+}
+
+###
+POST http://localhost:3000/api/payments
+Content-Type: application/json
+
+{
+  "order_id": 6,
+  "method": "Credit Card",
+  "amount": 150000,
+  "status": true
+}
+
+###
+POST http://localhost:3000/api/payments
+Content-Type: application/json
+
+{
+  "order_id": 6,
+  "method": "Tunai",
+  "amount": 150000,
+  "status": true
+}
+
+###
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "ayudya@gmail.com",
+    "password": "ryan123220198"
+}
+
+###
+PUT http://localhost:3000/api/users/8
+Content-Type: application/json
+
+{
+  "password": "ryankny198"
+}
+
+###
+GET http://localhost:3000/api/users/

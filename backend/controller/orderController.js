@@ -37,58 +37,72 @@ export const getOrders = async (req, res) => {
 };
 
 
-// GET ORDER BY ID
+// GET ORDER BY ID (revisi)
 export const getOrderById = async (req, res) => {
-    try {
-        const order = await Order.findOne({
-            where: { id: req.params.id },
-            include: ['user']
-        });
-        
-        if (!order) {
-            return res.status(404).json({ 
-                status: "error",
-                message: "Pesanan tidak ditemukan"
-            });
-        }
-        
-        res.status(200).json({
-            status: "success",
-            data: order
-        });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ 
-            status: "error",
-            message: "Terjadi kesalahan server"
-        });
+  try {
+    const order = await Order.findOne({
+      where: { id: req.params.id },
+      include: [{
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "email"]
+      }]
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        message: "Pesanan tidak ditemukan"
+      });
     }
+
+    res.status(200).json({
+      status: "success",
+      data: order
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: "Terjadi kesalahan server"
+    });
+  }
 };
 
-// CREATE ORDER
+// CREATE ORDER (revisi)
 export const createOrder = async (req, res) => {
-    try {
-        const { user_id, weight, total_price, service_type } = req.body;
-        
-        const order = await Order.create({
-    user_id,
-    weight,
-    total_price,
-    service_type
-});
-        
-        res.status(201).json({ 
-            status: "success",
-            message: "Pesanan berhasil dibuat",
-            data: order
-        });
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ 
-            status: "error",
-            message: "Terjadi kesalahan server"
-        });
-    }
+  const { user_id, weight, total_price, service_type, status, isPaid } = req.body;
+
+  if (!user_id || !weight || !total_price) {
+    return res.status(400).json({
+      status: "error",
+      message: "user_id, weight, dan total_price wajib diisi"
+    });
+  }
+
+  try {
+    const order = await Order.create({
+      user_id,
+      weight,
+      total_price,
+      service_type: service_type || "Regular",
+      status: status || "Pending",
+      isPaid: isPaid ?? false,
+      created_at: new Date()
+    });
+
+    res.status(201).json({
+      status: "success",
+      message: "Pesanan berhasil dibuat",
+      data: order
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      status: "error",
+      message: "Terjadi kesalahan server"
+    });
+  }
 };
 
 // UPDATE ORDER

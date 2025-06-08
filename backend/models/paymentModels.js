@@ -29,4 +29,23 @@ const Payment = db.define("payment", {
 Order.hasMany(Payment, { foreignKey: "order_id" });
 Payment.belongsTo(Order, { foreignKey: "order_id" });
 
+Payment.afterCreate(async (payment, options) => {
+  if (payment.status === true) {
+    await Order.update(
+      { isPaid: true, status: "Done" },
+      { where: { id: payment.order_id } }
+    );
+  }
+});
+
+Payment.afterUpdate(async (payment, options) => {
+  if (payment.status === true) {
+    await Order.update(
+      { isPaid: true, status: "Done" },
+      { where: { id: payment.order_id } }
+    );
+  }
+});
+
+
 export default Payment;

@@ -2,29 +2,32 @@ import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  let token;
 
-  if (authHeader) token = authHeader.split(" ")[1];
-
-  if (!token) {
+  if (!authHeader || typeof authHeader !== "string" || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
-      status: "Error",
-      message: "Token tidak ada",
+      status: "error",
+      message: "Token tidak ditemukan di header Authorization",
     });
   }
 
-  jwt.verify(
-    token, 
-    process.env.ACCESS_TOKEN_SECRET, 
-    (error, decoded) => {
-      if (error) {
-        return res.status(403).json({
-          status: "Error",
-          message: "Access token tidak valid",
-        });
-      }
-      req.email = decoded.email;
-      next();
+  const token = authHeader.split(" ")[1];
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({
+        status: "error",
+        message: "Access token tidak valid atau kedaluwarsa",
+      });
     }
-  );
+
+    // Simpan payload token ke req.user untuk akses endpoint lain
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name,
+      role: decoded.role
+    };
+
+    next();
+  });
 };

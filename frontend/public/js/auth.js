@@ -1,196 +1,170 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:3000/api';
+const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 menit
 
-// Fungsi utama setelah DOM siap
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-
     if (loginForm) {
-        loginForm.addEventListener('submit', handleLoginSubmit);
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!email || !password) {
+                showError("Email dan password harus diisi", errorMsg);
+                return;
+            }
+            if (!validateEmail(email)) {
+                showError("Format email tidak valid", errorMsg);
+                return;
+            }
+
+            setLoadingState(true, loginBtn);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Login gagal');
+                }
+
+                if (!result.data || !result.data.role) {
+                    throw new Error('Data pengguna tidak valid');
+                }
+
+                // Simpan session
+                const sessionPayload = JSON.stringify({
+                    user: result.data,
+                    timestamp: Date.now(),
+                    rememberMe
+                });
+
+                if (rememberMe) {
+                    localStorage.setItem('sessionData', sessionPayload);
+                } else {
+                    sessionStorage.setItem('sessionData', sessionPayload);
+                }
+
+                redirectBasedOnRole(result.data.role);
+
+            } catch (err) {
+                showError(err.message || 'Terjadi kesalahan saat login', errorMsg);
+            } finally {
+                setLoadingState(false, loginBtn);
+            }
+        });
     }
 
-    if (registerForm) {
-        registerForm.addEventListener('submit', handleRegisterSubmit);
+    // Check existing session
+    checkSession();
+
+    // Toggle password visibility
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', () => {
+            const passwordInput = document.getElementById('password');
+            const icon = togglePasswordBtn.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
     }
 });
 
-// Fungsi untuk menangani submit login
-async function handleLoginSubmit(event) {
-    event.preventDefault();
-
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const loginBtn = document.getElementById('loginBtn');
-    const errorMsg = document.getElementById('errorMsg');
-
-    // Validasi input
-    if (!validateInputs(email, password, errorMsg)) return;
-
-    // Tampilkan loading state
-    setLoadingState(true, loginBtn);
-
-    try {
-        // Proses login
-        const loginResult = await processLogin(email, password);
-
-        if (loginResult.success) {
-            handleSuccessfulLogin(loginResult.data);
-        } else {
-            throw new Error(loginResult.message || 'Login gagal');
-        }
-    } catch (error) {
-        handleLoginError(error, errorMsg);
-    } finally {
-        // Reset loading state
-        setLoadingState(false, loginBtn);
-    }
-}
-
-// Fungsi untuk menangani registrasi
-async function handleRegisterSubmit(event) {
-    event.preventDefault();
-
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const registerBtn = document.getElementById('registerBtn');
-    const errorMsg = document.getElementById('errorMsg');
-
-    // Validasi input
-    if (!name || !email || !phone || !password || !confirmPassword) {
-        showError("Semua field harus diisi", errorMsg);
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        showError("Password dan konfirmasi password tidak sama", errorMsg);
-        return;
-    }
-
-    // Tampilkan loading
-    registerBtn.disabled = true;
-    document.getElementById('registerText').classList.add('hidden');
-    document.getElementById('registerSpinner').classList.remove('hidden');
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name,
-                email,
-                password,
-                confirmPassword,
-                noHP: phone
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Registrasi gagal');
-        }
-
-        // Redirect to login with success message
-        window.location.href = 'login.html?registered=true';
-
-    } catch (error) {
-        console.error('Registration error:', error);
-        showError(error.message, errorMsg);
-    } finally {
-        registerBtn.disabled = false;
-        document.getElementById('registerText').classList.remove('hidden');
-        document.getElementById('registerSpinner').classList.add('hidden');
-    }
-}
-
-// Fungsi validasi input
-function validateInputs(email, password, errorElement) {
-    if (!email || !password) {
-        showError("Email dan password harus diisi", errorElement);
-        return false;
-    }
-
-    if (!validateEmail(email)) {
-        showError("Format email tidak valid", errorElement);
-        return false;
-    }
-
-    return true;
-}
-
-// Fungsi validasi format email
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
 }
 
-// Fungsi untuk menampilkan error
 function showError(message, errorElement) {
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.classList.remove('hidden');
-
-        setTimeout(() => {
-            errorElement.classList.add('hidden');
-        }, 5000);
-    }
+    if (!errorElement) return;
+    errorElement.classList.remove('hidden', 'bg-green-50', 'border-green-500', 'text-green-700');
+    errorElement.classList.add('bg-red-50', 'border-red-500', 'text-red-700');
+    errorElement.querySelector('#errorText').textContent = message;
+    setTimeout(() => errorElement.classList.add('hidden'), 5000);
 }
 
-// Fungsi untuk mengatur loading state
-function setLoadingState(isLoading, buttonElement) {
+function setLoadingState(isLoading, button) {
     if (isLoading) {
-        buttonElement.disabled = true;
-        buttonElement.innerHTML = `
-            <span class="inline-block animate-spin mr-2">↻</span>
-            Memproses...
-        `;
+        button.disabled = true;
+        button.querySelector('#loginText').classList.add('hidden');
+        button.querySelector('#loginSpinner').classList.remove('hidden');
     } else {
-        buttonElement.disabled = false;
-        buttonElement.innerHTML = 'Login';
+        button.disabled = false;
+        button.querySelector('#loginText').classList.remove('hidden');
+        button.querySelector('#loginSpinner').classList.add('hidden');
     }
 }
 
-// Fungsi untuk memproses login
-async function processLogin(email, password) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/users/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+function checkSession() {
+    let sessionData = localStorage.getItem('sessionData') || sessionStorage.getItem('sessionData');
 
-        const result = await response.json();
+    if (sessionData) {
+        try {
+            const { user, timestamp, rememberMe } = JSON.parse(sessionData);
 
-        if (!response.ok) {
-            return {
-                success: false,
-                message: result.message || 'Terjadi kesalahan saat login'
-            };
+            if (!rememberMe && (Date.now() - timestamp > SESSION_TIMEOUT)) {
+                // Session expired
+                if (rememberMe) localStorage.removeItem('sessionData');
+                else sessionStorage.removeItem('sessionData');
+                return;
+            }
+
+            // Cek jika saat ini bukan di halaman login
+            if (!window.location.pathname.includes('login.html')) {
+                redirectBasedOnRole(user.role);
+            }
+
+        } catch {
+            localStorage.removeItem('sessionData');
+            sessionStorage.removeItem('sessionData');
         }
-
-        return {
-            success: true,
-            data: result.data || result.user
-        };
-    } catch (error) {
-        console.error('Error in processLogin:', error);
-        return {
-            success: false,
-            message: 'Koneksi ke server gagal'
-        };
     }
 }
 
-// Fungsi untuk menangani login sukses
+function redirectBasedOnRole(role) {
+    role = role.toLowerCase();
+
+    if (role === 'admin') {
+        window.location.href = './admin/dashboard-admin.html';
+    } else if (role === 'customer') {
+        window.location.href = './customer/dashboard-customer.html';
+    } else {
+        console.warn('Role tidak dikenal:', role);
+        window.location.href = './login.html';
+    }
+}
+
+
+
+// Bersihkan session jika browser ditutup (kecuali rememberMe aktif)
+window.addEventListener('beforeunload', () => {
+    const sessionData = localStorage.getItem('sessionData');
+    if (sessionData) {
+        try {
+            const { rememberMe } = JSON.parse(sessionData);
+            if (!rememberMe) localStorage.removeItem('sessionData');
+        } catch {
+            localStorage.removeItem('sessionData');
+        }
+    }
+});
+
 function handleSuccessfulLogin(userData) {
-    // Simpan data user di localStorage
+    console.log('Login sukses, user data:', userData);  // Debug: tampilkan data user
+
     localStorage.setItem('authUser', JSON.stringify({
         id: userData.id,
         name: userData.name,
@@ -199,20 +173,7 @@ function handleSuccessfulLogin(userData) {
         role: userData.role
     }));
 
-    // Redirect berdasarkan role
-    redirectBasedOnRole(userData.role);
+    // Pastikan role lowercase agar cocok
+    redirectBasedOnRole(userData.role.toLowerCase());
 }
 
-// Fungsi untuk menangani error login
-function handleLoginError(error, errorElement) {
-    console.error('Login error:', error);
-
-    let errorMessage = 'Terjadi kesalahan saat login';
-    if (error.message) {
-        errorMessage = error.message;
-    } else if (error instanceof TypeError) {
-        errorMessage = 'Koneksi ke server gagal';
-    }
-
-    showError(errorMessage, errorElement);
-}

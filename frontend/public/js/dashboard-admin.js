@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cek autentikasi admin
@@ -76,29 +76,51 @@ function displayOrders(orders) {
         return;
     }
 
-    tbody.innerHTML = ''; // Menghapus isi tabel sebelumnya
-
     if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Tidak ada data pesanan</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4">Tidak ada data pesanan</td></tr>`;
         return;
     }
 
-    orders.forEach((order, index) => {
-        tbody.innerHTML += `
+    let rows = '';
+
+    orders.forEach(order => {
+        // Tentukan label dan warna status order
+        let statusLabel = '';
+        let statusClass = '';
+        switch (order.status) {
+            case 'Pending':
+                statusLabel = 'Pending';
+                statusClass = 'bg-yellow-100 text-yellow-800';
+                break;
+            case 'Processing':
+                statusLabel = 'Dalam Proses';
+                statusClass = 'bg-blue-100 text-blue-800';
+                break;
+            case 'Done':
+            case 'Selesai':
+                statusLabel = 'Selesai';
+                statusClass = 'bg-green-100 text-green-800';
+                break;
+            default:
+                statusLabel = order.status || '-';
+                statusClass = 'bg-gray-100 text-gray-800';
+        }
+
+        // Status bayar
+        const paymentStatus = order.isPaid ? 'Lunas' : 'Belum Dibayar';
+        const paymentClass = order.isPaid ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+
+        rows += `
             <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${order.user ? order.user.name : 'Tidak ada data'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${order.user ? order.user.name : 'User tidak ditemukan'}</td>
                 <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
                 <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price?.toLocaleString('id-ID') ?? '0'}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                        order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                        order.status === 'Processing' ? 'bg-blue-100 text-blue-800' :
-                        'bg-green-100 text-green-800'
-                    } rounded-full">
-                        ${order.status === 'Pending' ? 'Pending' :
-                        order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
-                    </span>
+                    <span class="inline-block px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">${statusLabel}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="${paymentClass}">${paymentStatus}</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">${order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID') : '-'}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -108,7 +130,10 @@ function displayOrders(orders) {
             </tr>
         `;
     });
+
+    tbody.innerHTML = rows;
 }
+
 
 // Fungsi untuk memperbarui statistik pesanan
 function updateOrderStatistics(orders) {

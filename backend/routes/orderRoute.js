@@ -11,10 +11,11 @@ import {
 const router = express.Router();
 
 // Ganti endpoint ini untuk konsistensi
-router.get("/orders", getOrders);
-router.get("/orders/:id", getOrderById);
-router.post("/orders", createOrder);
-router.put("/orders/:id", updateOrder);
-router.delete("/orders/:id", deleteOrder);
+router.get("/", getOrders);
+router.get("/:id", getOrderById);
+router.post("/", createOrder);
+router.put("/:id", updateOrder);
+router.delete("/:id", deleteOrder);
+
 
 export default router;
