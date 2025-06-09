@@ -11,7 +11,7 @@ const Payment = db.define("payment", {
         type: Sequelize.STRING,
         allowNull: false,
     },
-    amount: {
+    total_price: {
         type: Sequelize.FLOAT,
         allowNull: false,
     },

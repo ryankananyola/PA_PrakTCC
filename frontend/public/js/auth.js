@@ -141,7 +141,7 @@ function checkSession() {
 function redirectBasedOnRole(role) {
     role = role.toLowerCase();
 
-    console.log('Redirecting for role:', role); // Debug penting
+    console.log('Redirecting for role:', role); 
 
     if (role === 'admin') {
         window.location.href = 'admin/dashboard-admin.html';
@@ -156,7 +156,7 @@ function redirectBasedOnRole(role) {
 
 
 function handleSuccessfulLogin(userData) {
-    console.log('Login sukses, user data:', userData); // Debugging
+    console.log('Login sukses, user data:', userData); 
 
     localStorage.setItem('authUser', JSON.stringify({
         id: userData.id,

@@ -33,19 +33,20 @@
             });
 
             document.getElementById('search-input-order')?.addEventListener('input', handleSearchOrders); // Menggunakan ID yang benar
-            document.getElementById('edit-order-form')?.addEventListener('submit', handleEditOrder);
+            // document.getElementById('edit-order-form')?.addEventListener('submit', handleEditOrder);
         });
 
        function checkAuth() {
-            const authUser = JSON.parse(localStorage.getItem('authUser'));
-            if (!authUser || authUser.role !== 'user') {
-                window.location.href = '../login.html'; // Sesuaikan path jika perlu
-                return;
-            }
-            currentUserId = authUser.id; // Simpan ID user
-            renderDashboard(authUser);
-            loadOrders(); // Panggil loadOrders setelah dashboard dirender
-        }loadOrders(); // Panggil loadOrders setelah dashboard dirender
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            if (!authUser || authUser.role !== 'customer') {
+                window.location.href = '../login.html'; // Sesuaikan path jika perlu
+                return;
+            }
+            currentUserId = authUser.id; // Simpan ID user
+            renderDashboard(authUser);
+            loadOrders(); // Panggil loadOrders setelah dashboard dirender
+        }
+
         
 
         function renderDashboard(user) {
@@ -67,83 +68,94 @@
                 <main class="container mx-auto p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in">
-                            <div class="flex items-center justify-between">
+                              <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 font-semibold">Total Pesanan</p>
-                                    <h3 class="text-2xl font-bold text-blue-600" id="total-orders">0</h3>
+                                    <p class="text-gray-500 text-sm font-semibold">Total Pesanan</p>
+                                    <h3 class="text-3xl font-bold text-blue-600">3</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                                    <i class="fas fa-box-open fa-lg"></i>
+                                <i class="fas fa-box-open fa-lg"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-100">
-                            <div class="flex items-center justify-between">
+                             <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-100 flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 font-semibold">Dalam Proses</p>
-                                    <h3 class="text-2xl font-bold text-yellow-600" id="processing-orders">0</h3>
+                                    <p class="text-gray-500 text-sm font-semibold">Dalam Proses</p>
+                                    <h3 class="text-3xl font-bold text-yellow-600" id="processing-orders">0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
                                     <i class="fas fa-spinner fa-lg animate-spin"></i>
                                 </div>
                             </div>
+
                         </div>
                         <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-gray-500 font-semibold">Selesai</p>
-                                    <h3 class="text-2xl font-bold text-green-600" id="completed-orders">0</h3>
-                                </div>
-                                <div class="p-3 rounded-full bg-green-100 text-green-600">
-                                    <i class="fas fa-check-circle fa-lg"></i>
-                                </div>
+                            <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in delay-200 flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm font-semibold">Selesai</p>
+                                <h3 class="text-3xl font-bold text-green-600" id="completed-orders">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle fa-lg"></i>
+                            </div>
                             </div>
                         </div>
                         
                     </div>
 
-                    <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-lg font-semibold text-gray-700">Daftar Pesanan</h2>
-                            <div class="flex items-center space-x-4">
-                                <div class="relative">
-                                    <input type="text" id="search-input-order" placeholder="Cari pesanan..."
-                                        class="px-4 py-2 border rounded-md pl-10 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
+                    <!-- Ini yang baru -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+                        <!-- Header -->
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-6 py-4 border-b">
+                            <h2 class="text-xl font-semibold text-gray-800">Daftar Pesanan</h2>
+                            <div class="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-0 w-full md:w-auto">
+                            <div class="relative w-full md:w-auto">
+                                <input type="text" id="search-input-order" placeholder="Cari pesanan..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200 transition duration-200">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
                                 </div>
-                                <a href="create-order.html" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-200">
-                                    <i class="fas fa-plus mr-2"></i>Tambah Pesanan
-                                </a>
+                            </div>
+                            <a href="create-order.html"
+                                class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-2 rounded-lg transition duration-200 shadow">
+                                <i class="fas fa-plus mr-2"></i> Tambah Pesanan
+                            </a>
                             </div>
                         </div>
+
+                        <!-- Loading / Error -->
                         <div id="order-loading" class="hidden flex justify-center py-4">
                             <div class="loading-spinner"></div>
                         </div>
-                        <div id="order-error" class="hidden text-red-500 mb-2"></div>
+                        <div id="order-error" class="hidden text-red-500 px-6 py-2"></div>
+
+                        <!-- Table -->
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Berat</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="orders-table-body">
-                                    <tr><td colspan="7" class="px-6 py-4 whitespace-nowrap text-center text-gray-500">Memuat data pesanan...</td></tr>
-                                </tbody>
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                <tr>
+                                <th class="px-6 py-3 text-left">ID</th>
+                                <th class="px-6 py-3 text-left">Pelanggan</th>
+                                <th class="px-6 py-3 text-left">Berat</th>
+                                <th class="px-6 py-3 text-left">Harga</th>
+                                <th class="px-6 py-3 text-left">Status</th>
+                                <th class="px-6 py-3 text-left">Tanggal</th>
+                                <th class="px-6 py-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">Memuat data pesanan...</td></tr>
+                            </tbody>
                             </table>
                         </div>
-                        <div class="px-6 py-3 bg-gray-50 flex justify-between items-center" id="pagination-container">
-                            <p class="text-sm text-gray-700" id="pagination-info"></p>
+
+                        <!-- Pagination -->
+                        <div id="pagination-container" class="px-6 py-3 bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
+                            <p class="text-sm text-gray-600" id="pagination-info">Menampilkan 1–3 dari 3</p>
                             <div class="space-x-2" id="pagination-buttons">
-                                </div>
+                                <!-- Tombol pagination akan di-render di sini -->
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -207,7 +219,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.user ? order.user.name : 'Tidak ada data'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
-                    <td class="px-6 py-4 whitespace-nowrap">Rp${order.totalPrice?.toLocaleString('id-ID') ?? '0'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price?.toLocaleString('id-ID') ?? '0'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-block px-2 py-1 text-xs font-semibold ${
                             order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
@@ -287,85 +299,12 @@
             const pendingOrders = orders.filter(o => o.status === 'Pending').length;
             const processingOrders = orders.filter(o => o.status === 'Processing').length;
             const completedOrders = orders.filter(o => o.status === 'Done').length;
-            const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.total_price || 0), 0);
 
             document.getElementById('total-orders').textContent = totalOrders;
             document.getElementById('processing-orders').textContent = processingOrders;
             document.getElementById('completed-orders').textContent = completedOrders;
             document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
-        }
-
-        async function editOrder(orderId) {
-            try {
-                showLoading('edit-modal', true); // Gunakan ID modal untuk loading
-
-                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
-                if (!response.ok) {
-                    throw new Error('Gagal mengambil data pesanan');
-                }
-
-                const data = await response.json();
-
-                if (data.status !== "success") {
-                    throw new Error(data.message || 'Gagal mengambil data pesanan');
-                }
-
-                document.getElementById('edit-order-id').value = data.data.id;
-                document.getElementById('edit-weight').value = data.data.weight;
-                document.getElementById('edit-price').value = data.data.totalPrice; // Perbaikan: Gunakan totalPrice
-                document.getElementById('edit-status').value = data.data.status;
-
-                document.getElementById('edit-modal').classList.remove('hidden');
-
-            } catch (error) {
-                showError('error-alert', error.message); // Gunakan ID alert global
-            } finally {
-                showLoading('edit-modal', false);
-            }
-        }
-
-        async function handleEditOrder(e) {
-            e.preventDefault();
-
-            const orderId = document.getElementById('edit-order-id').value;
-            const weight = document.getElementById('edit-weight').value;
-            const price = document.getElementById('edit-price').value;
-            const status = document.getElementById('edit-status').value;
-
-            try {
-                showLoading('edit-modal', true); // Gunakan ID modal untuk loading
-
-                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        weight: parseFloat(weight),
-                        total_price: parseFloat(price), // Perbaikan: Kirim sebagai total_price ke backend
-                        status
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Gagal memperbarui pesanan');
-                }
-
-                const data = await response.json();
-
-                if (data.status !== "success") {
-                    throw new Error(data.message || 'Gagal memperbarui pesanan');
-                }
-
-                document.getElementById('edit-modal').classList.add('hidden');
-                loadOrders(); // Refresh order data
-                showSuccess('Pesanan berhasil diperbarui');
-
-            } catch (error) {
-                showError('error-alert', error.message); // Gunakan ID alert global
-            } finally {
-                showLoading('edit-modal', false);
-            }
         }
 
         function handleSearchOrders(e) {
@@ -376,7 +315,7 @@
                     String(order.id).toLowerCase().includes(searchTerm) ||
                     customerName.includes(searchTerm) ||
                     String(order.weight).includes(searchTerm) ||
-                    String(order.totalPrice).includes(searchTerm) || // Perbaikan: Gunakan totalPrice
+                    String(order.total_price).includes(searchTerm) || 
                     order.status.toLowerCase().includes(searchTerm) ||
                     (order.createdAt ? new Date(order.createdAt).toLocaleDateString('id-ID').includes(searchTerm) : false) // Perbaikan: Gunakan createdAt
                 );

@@ -4,34 +4,17 @@ import Order from "../models/orderModels.js";
 // CREATE payment
 export const createPayment = async (req, res) => {
     try {
-        const { order_id, method, amount, status, payment_date } = req.body;
+        const { order_id, method, total_price, status, payment_date } = req.body;
 
         const payment = await Payment.create({
             order_id,
             method,
-            amount,
+            total_price,
             status,
             payment_date,
         });
-    // Fungsi untuk memastikan status bernilai benar
-    const normalizeStatus = (val) => {
-        if (typeof val === "boolean") return val;
-        if (typeof val === "string") return val.toLowerCase() === "true" || val === "1";
-        if (typeof val === "number") return val === 1;
-        return false;
-    };
 
-    if (normalizeStatus(status)) {
-        const order = await Order.findByPk(order_id);
-        if (!order) {
-            return res.status(404).json({ msg: "Order not found" });
-        }
-
-        await order.update({ status: "Done" });
-    }
-
-
-        res.status(201).json({ msg: "Payment Created and Order Updated" });
+        res.status(201).json({ msg: "Payment Created" });
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ msg: "Error creating payment" });
