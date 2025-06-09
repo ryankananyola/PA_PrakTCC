@@ -116,7 +116,7 @@
                             </div>
 
                             <!-- Payment TotalPrice-->
-                            <div id="paymentTotalPriceSection" class="hidden">
+                            <div id="paymentAmountSection" class="hidden">
                                 <h3 class="text-lg font-semibold mb-4">Jumlah Pembayaran</h3>
                                 <div class="bg-gray-50 p-4 rounded-lg mb-4">
                                     <p class="text-sm text-gray-600 mb-1">Total Tagihan</p>
@@ -149,7 +149,7 @@
                 </div>
 
                 <!-- Payment History -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <!-- <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">Riwayat Pembayaran</h2>
                         <div class="overflow-x-auto">
@@ -171,7 +171,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </main>
     </div>
@@ -184,288 +184,261 @@
     </footer>
 
      <script>
-        const API_BASE_URL = 'http://localhost:3000/api';
-        let currentStep = 1;
-        let selectedOrder = null;
+  const API_BASE_URL = 'http://localhost:3000/api';
+  let currentStep = 1;
+  let selectedOrder = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load customer's orders
-            loadCustomerOrders();
-            
-            // Load payment history
-            loadPaymentHistory();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Check if order_id is in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderId = urlParams.get('order_id');
-            if (orderId) {
-                document.getElementById('orderId').value = orderId;
-                loadOrderDetails(orderId);
-            }
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCustomerOrders();
+    loadPaymentHistory();
+    setupEventListeners();
+
+    const orderId = new URLSearchParams(window.location.search).get('order_id');
+    if (orderId) {
+      document.getElementById('orderId').value = orderId;
+      loadOrderDetails(orderId);
+    }
+  });
+
+  function setupEventListeners() {
+    // Order selection
+    document.getElementById('orderSelect').addEventListener('change', function () {
+      const orderId = this.value;
+      fetch(`${API_BASE_URL}/orders/${orderId}`)
+        .then(res => res.json())
+        .then(order => {
+          document.getElementById('billTotalPrice').textContent = `Rp${order.total_price.toLocaleString('id-ID')}`;
+          document.getElementById('orderTotalPrice').textContent = `Total: Rp${order.total_price.toLocaleString('id-ID')}`;
         });
+    });
 
-        function setupEventListeners() {
-            // Order selection
-            document.getElementById('orderSelect').addEventListener('change', function() {
-                const orderId = this.value;
-                if (orderId) {
-                    document.getElementById('orderId').value = orderId;
-                    loadOrderDetails(orderId);
-                } else {
-                    document.getElementById('orderDetails').classList.add('hidden');
-                }
-            });
+    // Payment method selection
+    document.querySelectorAll('.payment-method').forEach(method => {
+      method.addEventListener('click', function () {
+        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected', 'border-purple-500'));
+        this.classList.add('selected', 'border-purple-500');
+        document.getElementById('paymentMethod').value = this.dataset.method;
+      });
+    });
 
-            // Payment method selection
-            document.querySelectorAll('.payment-method').forEach(method => {
-                method.addEventListener('click', function() {
-                    document.querySelectorAll('.payment-method').forEach(m => {
-                        m.classList.remove('selected', 'border-purple-500');
-                    });
-                    this.classList.add('selected', 'border-purple-500');
-                    document.getElementById('paymentMethod').value = this.dataset.method;
-                });
-            });
+    // Full payment checkbox
+    document.getElementById('fullPayment').addEventListener('change', function () {
+      const total = parseInt(document.getElementById('billTotalPrice').textContent.replace(/[^\d]/g, ''));
+      document.getElementById('total_price').value = this.checked ? total : '';
+    });
 
-            // Full payment checkbox
-            document.getElementById('fullPayment').addEventListener('change', function() {
-                if (this.checked && selectedOrder) {
-                    document.getElementById('amount').value = selectedOrder.total_price;
-                }
-            });
+    document.getElementById('nextBtn').addEventListener('click', nextStep);
+    document.getElementById('prevBtn').addEventListener('click', prevStep);
 
-            // Next/prev buttons
-            document.getElementById('nextBtn').addEventListener('click', nextStep);
-            document.getElementById('prevBtn').addEventListener('click', prevStep);
+    document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
+  }
 
-            // Form submission
-            document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
-        }
-
-        async function loadCustomerOrders() {
-            try {
-                const authUser = JSON.parse(localStorage.getItem('authUser'));
-                if (!authUser) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-
-                const response = await fetch(`${API_BASE_URL}/orders?user_id=${authUser.id}`);
-                const data = await response.json();
-                
-                const orderSelect = document.getElementById('orderSelect');
-                orderSelect.innerHTML = '<option value="">-- Pilih Pesanan --</option>';
-                
-                if (data.data && data.data.length > 0) {
-                    data.data.forEach(order => {
-                        const option = document.createElement('option');
-                        option.value = order.id;
-                        option.textContent = `Order #${order.id} - ${order.status === 'Done' ? 'Selesai' : 'Proses'} - Rp${order.total_price.toLocaleString('id-ID')}`;
-                        orderSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
-        }
-
-        async function loadOrderDetails(orderId) {
+  async function loadCustomerOrders() {
     try {
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
-        const { data: order } = await response.json();
+      const authUser = JSON.parse(localStorage.getItem('authUser'));
+      if (!authUser) return (window.location.href = 'login.html');
 
-        console.log('Order details:', order);  // debug cek isi order
+      const res = await fetch(`${API_BASE_URL}/orders?user_id=${authUser.id}`);
+      const { data } = await res.json();
+      const orderSelect = document.getElementById('orderSelect');
+      orderSelect.innerHTML = '<option value="">-- Pilih Pesanan --</option>';
 
-        selectedOrder = order;
+      if (data?.length) {
+        data.forEach(order => {
+          const option = document.createElement('option');
+          option.value = order.id;
+          option.textContent = `Order #${order.id} - ${order.status === 'Done' ? 'Selesai' : 'Proses'} - Rp${order.total_price.toLocaleString('id-ID')}`;
+          orderSelect.appendChild(option);
+        });
+      }
+    } catch (err) {
+      console.error('Error loading orders:', err);
+    }
+  }
 
-        document.getElementById('orderCustomer').textContent = `Pelanggan: ${order.user?.name || 'Tidak ada data'}`;
-        document.getElementById('orderWeight').textContent = `Berat: ${order.weight} kg`;
+  async function loadOrderDetails(orderId) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+      const { data: order } = await res.json();
 
-        // Ganti order.amount dengan order.total_price jika itu yang ada
-        const amountValue = order.amount ?? order.total_price ?? 0;
-        document.getElementById('orderTotalPrice').textContent = `Total: Rp${order.total_price.toLocaleString('id-ID')}`;
+      selectedOrder = order;
 
-        const statusElement = document.getElementById('orderStatus');
-        statusElement.textContent = `Status: ${order.status === 'Done' ? 'Selesai' : 'Proses'}`;
-        statusElement.className = order.status === 'Done' ? 'text-sm text-green-600' : 'text-sm text-yellow-600';
+      document.getElementById('orderCustomer').textContent = `Pelanggan: ${order.user?.name || 'Tidak ada data'}`;
+      document.getElementById('orderWeight').textContent = `Berat: ${order.weight} kg`;
+      document.getElementById('orderTotalPrice').textContent = `Total: Rp${order.total_price.toLocaleString('id-ID')}`;
+      document.getElementById('billTotalPrice').textContent = `Rp${order.total_price.toLocaleString('id-ID')}`;
 
-        document.getElementById('orderDetails').classList.remove('hidden');
-        document.getElementById('billTotalPrice').textContent = `Rp${order.total_price.toLocaleString('id-ID')}`;
+      const statusEl = document.getElementById('orderStatus');
+      statusEl.textContent = `Status: ${order.status === 'Done' ? 'Selesai' : 'Proses'}`;
+      statusEl.className = order.status === 'Done' ? 'text-sm text-green-600' : 'text-sm text-yellow-600';
 
-        document.getElementById('paymentMethodSection').classList.remove('hidden');
-        updateStepVisual(2);
-    } catch (error) {
-        console.error('Error loading order details:', error);
+      document.getElementById('orderDetails').classList.remove('hidden');
+      document.getElementById('paymentMethodSection').classList.remove('hidden');
+      updateStepVisual(2);
+    } catch (err) {
+      console.error('Error loading order details:', err);
+    }
+  }
+
+  async function loadPaymentHistory() {
+    try {
+      const authUser = JSON.parse(localStorage.getItem('authUser'));
+      if (!authUser) return;
+
+      const res = await fetch(`${API_BASE_URL}/payments/`);
+      const { data: payments } = await res.json();
+      const tbody = document.getElementById('paymentHistory');
+      tbody.innerHTML = '';
+
+      if (payments?.length) {
+        payments.forEach(payment => {
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-gray-50';
+          row.innerHTML = `
+            <td class="px-6 py-4 text-sm text-gray-500">${payment.id}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${new Date(payment.payment_date).toLocaleDateString('id-ID')}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${payment.method}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">Rp${payment.total_price.toLocaleString('id-ID')}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs rounded-full ${payment.status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                ${payment.status ? 'Lunas' : 'Pending'}
+              </span>
+            </td>`;
+          tbody.appendChild(row);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada riwayat pembayaran</td></tr>`;
+      }
+    } catch (err) {
+      console.error('Error loading payment history:', err);
+    }
+  }
+
+  function nextStep() {
+    if (currentStep === 1 && !document.getElementById('orderId').value) {
+        alert('Silakan pilih pesanan terlebih dahulu');
+        return;
+    }
+
+    if (currentStep === 2 && !document.getElementById('paymentMethod').value) {
+        alert('Silakan pilih metode pembayaran');
+        return;
+    }
+
+    if (currentStep === 3 && !document.getElementById('total_price').value) {
+        alert('Silakan masukkan jumlah pembayaran');
+        return;
+    }
+
+    currentStep++;
+    updateStepVisual(currentStep);
+
+    if (currentStep === 2) {
+        const methodSection = document.getElementById('paymentMethodSection');
+        const prevBtn = document.getElementById('prevBtn');
+        if (methodSection) methodSection.classList.remove('hidden');
+        if (prevBtn) prevBtn.classList.remove('hidden');
+    } else if (currentStep === 3) {
+        const amountSection = document.getElementById('paymentAmountSection'); // Periksa id ini apakah benar
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        if (amountSection) amountSection.classList.remove('hidden');
+        if (nextBtn) nextBtn.classList.add('hidden');
+        if (submitBtn) submitBtn.classList.remove('hidden');
     }
 }
 
 
-        async function loadPaymentHistory() {
-            try {
-                const authUser = JSON.parse(localStorage.getItem('authUser'));
-                if (!authUser) return;
+  function prevStep() {
+    currentStep--;
+    updateStepVisual(currentStep);
 
-                const response = await fetch(`${API_BASE_URL}/payments/`);
-                const { data: payments } = await response.json();
-                
-                const tbody = document.getElementById('paymentHistory');
-                tbody.innerHTML = '';
-                
-                if (payments && payments.length > 0) {
-                    payments.forEach(payment => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-50';
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.id}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(payment.payment_date).toLocaleDateString('id-ID')}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${payment.method}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp${payment.total_price.toLocaleString('id-ID')}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs rounded-full ${payment.status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
-                                    ${payment.status ? 'Lunas' : 'Pending'}
-                                </span>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                } else {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada riwayat pembayaran</td>
-                        </tr>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error loading payment history:', error);
-                document.getElementById('paymentHistory').innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat riwayat pembayaran</td>
-                    </tr>
-                `;
-            }
-        }
+    if (currentStep === 1) {
+      document.getElementById('paymentMethodSection').classList.add('hidden');
+      document.getElementById('prevBtn').classList.add('hidden');
+    } else if (currentStep === 2) {
+      document.getElementById('paymentAmountSection').classList.add('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('submitBtn').classList.add('hidden');
+    }
+  }
 
-        function nextStep() {
-            if (currentStep === 1 && !document.getElementById('orderId').value) {
-                alert('Silakan pilih pesanan terlebih dahulu');
-                return;
-            }
-            
-            if (currentStep === 2 && !document.getElementById('paymentMethod').value) {
-                alert('Silakan pilih metode pembayaran');
-                return;
-            }
-            
-            if (currentStep === 3 && !document.getElementById('amount').value) {
-                alert('Silakan masukkan jumlah pembayaran');
-                return;
-            }
-            
-            currentStep++;
-            updateStepVisual(currentStep);
-            
-            if (currentStep === 2) {
-                document.getElementById('paymentMethodSection').classList.remove('hidden');
-                document.getElementById('prevBtn').classList.remove('hidden');
-            } else if (currentStep === 3) {
-                document.getElementById('paymentAmountSection').classList.remove('hidden');
-                document.getElementById('nextBtn').classList.add('hidden');
-                document.getElementById('submitBtn').classList.remove('hidden');
-            }
-        }
+  function updateStepVisual(step) {
+    document.querySelectorAll('.step').forEach((el, index) => {
+      const number = el.querySelector('div');
+      const text = el.querySelector('p');
 
-        function prevStep() {
-            currentStep--;
-            updateStepVisual(currentStep);
-            
-            if (currentStep === 1) {
-                document.getElementById('paymentMethodSection').classList.add('hidden');
-                document.getElementById('prevBtn').classList.add('hidden');
-            } else if (currentStep === 2) {
-                document.getElementById('paymentAmountSection').classList.add('hidden');
-                document.getElementById('nextBtn').classList.remove('hidden');
-                document.getElementById('submitBtn').classList.add('hidden');
-            }
-        }
+      if (index + 1 === step) {
+        number.className = 'bg-purple-600 text-white';
+        text.className = 'text-purple-600 font-medium';
+      } else if (index + 1 < step) {
+        number.className = 'bg-green-500 text-white';
+        text.className = 'text-green-600 font-medium';
+      } else {
+        number.className = 'bg-gray-200 text-gray-600';
+        text.className = 'text-gray-500';
+      }
+    });
+  }
 
-        function updateStepVisual(step) {
-            document.querySelectorAll('.step').forEach((el, index) => {
-                const number = el.querySelector('div');
-                const text = el.querySelector('p');
-                
-                if (index + 1 === step) {
-                    number.classList.remove('bg-gray-200', 'text-gray-600');
-                    number.classList.add('bg-purple-600', 'text-white');
-                    text.classList.remove('text-gray-500');
-                    text.classList.add('text-purple-600', 'font-medium');
-                } else if (index + 1 < step) {
-                    number.classList.remove('bg-gray-200', 'text-gray-600');
-                    number.classList.add('bg-green-500', 'text-white');
-                    text.classList.remove('text-gray-500');
-                    text.classList.add('text-green-600', 'font-medium');
-                } else {
-                    number.classList.remove('bg-purple-600', 'text-white', 'bg-green-500');
-                    number.classList.add('bg-gray-200', 'text-gray-600');
-                    text.classList.remove('text-purple-600', 'font-medium', 'text-green-600');
-                    text.classList.add('text-gray-500');
-                }
-            });
-        }
+  async function handlePaymentSubmit(e) {
+    e.preventDefault();
 
-        async function handlePaymentSubmit(e) {
-            e.preventDefault();
-            
-            const paymentData = {
-                order_id: document.getElementById('orderId').value,
-                method: document.getElementById('paymentMethod').value,
-                amount: parseFloat(document.getElementById('amount').value),
-                status: true, // Assuming payment is successful when submitted
-                payment_date: new Date().toISOString()
-            };
+    const orderId = document.getElementById('orderId').value;
+    const method = document.getElementById('paymentMethod').value;
+    const jumlahDibayar = parseInt(document.getElementById('total_price').value);
+    const totalTagihan = parseInt(document.getElementById('billTotalPrice').textContent.replace(/[^\d]/g, ''));
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/payments/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(paymentData)
-                });
+    if (isNaN(jumlahDibayar) || jumlahDibayar <= 0) {
+      return alert('Jumlah yang dibayar harus lebih dari 0!');
+    }
 
-                const data = await response.json();
+    if (jumlahDibayar < totalTagihan) {
+      return alert('Jumlah yang dibayar kurang dari total tagihan!');
+    }
 
-                if (response.ok) {
-                    alert('Pembayaran berhasil diproses!');
-                    loadPaymentHistory();
-                    
-                    // Reset form
-                    document.getElementById('paymentForm').reset();
-                    document.querySelectorAll('.payment-method').forEach(m => {
-                        m.classList.remove('selected', 'border-purple-500');
-                    });
-                    document.getElementById('paymentMethod').value = '';
-                    document.getElementById('orderDetails').classList.add('hidden');
-                    document.getElementById('orderSelect').value = '';
-                    
-                    // Reset steps
-                    currentStep = 1;
-                    updateStepVisual(currentStep);
-                    document.getElementById('paymentMethodSection').classList.add('hidden');
-                    document.getElementById('paymentAmountSection').classList.add('hidden');
-                    document.getElementById('prevBtn').classList.add('hidden');
-                    document.getElementById('nextBtn').classList.remove('hidden');
-                    document.getElementById('submitBtn').classList.add('hidden');
-                } else {
-                    throw new Error(data.message || 'Gagal memproses pembayaran');
-                }
-            } catch (error) {
-                console.error('Payment error:', error);
-                alert('Terjadi kesalahan: ' + error.message);
-            }
-        }
-    </script>
+    const paymentData = {
+      order_id: orderId,
+      method: method,
+      total_price: jumlahDibayar,
+      status: true,
+      payment_date: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/payments/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData)
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Gagal memproses pembayaran');
+
+      alert('Pembayaran berhasil diproses!');
+      loadPaymentHistory();
+
+      // Reset form
+      document.getElementById('paymentForm').reset();
+      document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected', 'border-purple-500'));
+      document.getElementById('orderDetails').classList.add('hidden');
+      document.getElementById('orderSelect').value = '';
+      document.getElementById('paymentMethod').value = '';
+
+      currentStep = 1;
+      updateStepVisual(currentStep);
+      document.getElementById('paymentMethodSection').classList.add('hidden');
+      document.getElementById('paymentAmountSection').classList.add('hidden');
+      document.getElementById('prevBtn').classList.add('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('submitBtn').classList.add('hidden');
+
+    } catch (err) {
+      console.error('Payment error:', err);
+      alert('Terjadi kesalahan: ' + err.message);
+    }
+  }
+</script>
+
 </body>
 </html>
