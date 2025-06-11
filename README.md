@@ -13,6 +13,7 @@ blabla
 | DELETE | `/api/auth/logout`  | Logout pengguna dan menghapus refresh token dari server.               |
 
 ### Users Management
+Semua endpoint di bagian ini **memerlukan autentikasi (Protected Route)**.
 | Method | Endpoint         | Deskripsi                                              |
 |--------|------------------|-------------------------------------------------------|
 | GET    | `/api/users/`    | Mendapatkan daftar seluruh pengguna (Protected)       |
@@ -21,3 +22,23 @@ blabla
 | PUT    | `/api/users/:id` | Mengupdate data pengguna berdasarkan ID (Protected)   |
 | DELETE | `/api/users/:id` | Menghapus pengguna berdasarkan ID (Protected)         |
 
+### Order Management
+Semua endpoint di bagian ini **memerlukan autentikasi (Protected Route)**.
+| Method | Endpoint           | Deskripsi                                |
+|--------|--------------------|------------------------------------------|
+| GET    | `/api/orders/`     | Mendapatkan daftar semua pesanan.       |
+| GET    | `/api/orders/:id`  | Mendapatkan detail pesanan berdasarkan ID. |
+| POST   | `/api/orders/`     | Membuat pesanan baru.                   |
+| PUT    | `/api/orders/:id`  | Mengupdate data pesanan berdasarkan ID. |
+| DELETE | `/api/orders/:id`  | Menghapus pesanan berdasarkan ID.       |
+
+### Payments Management
+Semua endpoint di bagian ini **memerlukan autentikasi token (Protected Route)**.
+| Method | Endpoint                       | Deskripsi                                                     |
+|--------|--------------------------------|--------------------------------------------------------------|
+| GET    | `/api/payments/`               | Mendapatkan daftar semua pembayaran.                         |
+| GET    | `/api/payments/:id`            | Mendapatkan detail pembayaran berdasarkan ID pembayaran.     |
+| GET    | `/api/payments/order/:orderId` | Mendapatkan pembayaran berdasarkan ID pesanan terkait.       |
+| POST   | `/api/payments/`               | Membuat data pembayaran baru.                                |
+| PUT    | `/api/payments/:id`            | Mengupdate data pembayaran berdasarkan ID pembayaran.        |
+| DELETE | `/api/payments/:id`            | Menghapus pembayaran berdasarkan ID pembayaran.              |
