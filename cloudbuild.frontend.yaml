@@ -1,7 +1,11 @@
 steps:
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
-    args: ["app", "deploy", "--quiet"]
+    args:
+      - app
+      - deploy
+      - app.yaml
+      - "--quiet"
     dir: "frontend"
 
 options:
