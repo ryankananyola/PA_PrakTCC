@@ -1,1 +1,1 @@
-export const API_BASE_URL = "http://localhost:3000/api";
+export const API_BASE_URL = "https://laundry-198-325333151890.us-central1.run.app/api";

@@ -111,7 +111,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/users/register
+POST https://laundry-198-325333151890.us-central1.run.app/api/users/register
 Content-Type: application/json
 
 {
