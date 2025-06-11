@@ -62,7 +62,7 @@ User.beforeUpdate(async (user) => {
 // Sinkronisasi model ke database
 (async () => {
   try {
-    await db.sync({ alter: true }); // gunakan alter agar update kolom jika perlu
+    await db.sync({ force: true }); // gunakan alter agar update kolom jika perlu
     console.log('Tabel users siap digunakan');
   } catch (error) {
     console.error('Gagal sinkronisasi tabel users:', error);

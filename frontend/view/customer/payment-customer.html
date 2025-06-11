@@ -70,12 +70,8 @@
                             
                             <!-- Order Selection -->
                             <div id="orderSelectionSection">
-                                <h3 class="text-lg font-semibold mb-4">Pilih Pesanan</h3>
-                                <select id="orderSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
-                                    <option value="">-- Pilih Pesanan --</option>
-                                    <!-- Options will be loaded from API -->
-                                </select>
-                                <div id="orderDetails" class="mt-4 hidden">
+                                <h3 class="text-lg font-semibold mb-4">Detail Pesanan</h3>
+                                <div id="orderDetails" class="mt-4">
                                     <div class="bg-gray-50 p-4 rounded-lg">
                                         <h4 class="font-medium">Detail Pesanan</h4>
                                         <p id="orderCustomer" class="text-sm text-gray-600"></p>
@@ -149,7 +145,7 @@
                 </div>
 
                 <!-- Payment History -->
-                <!-- <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
                     <div class="p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">Riwayat Pembayaran</h2>
                         <div class="overflow-x-auto">
@@ -171,7 +167,7 @@
                             </table>
                         </div>
                     </div>
-                </div> -->
+                </div>
             </div>
         </main>
     </div>
@@ -183,34 +179,50 @@
         </div>
     </footer>
 
-     <script>
-  const API_BASE_URL = 'http://localhost:3000/api';
+     <script type="module">
+  import { API_BASE_URL } from '../../public/js/utils.js';
   let currentStep = 1;
   let selectedOrder = null;
 
   document.addEventListener('DOMContentLoaded', () => {
-    loadCustomerOrders();
-    loadPaymentHistory();
-    setupEventListeners();
-
-    const orderId = new URLSearchParams(window.location.search).get('order_id');
-    if (orderId) {
-      document.getElementById('orderId').value = orderId;
-      loadOrderDetails(orderId);
-    }
-  });
+  const orderId = new URLSearchParams(window.location.search).get('order_id');
+  if (orderId) {
+    document.getElementById('orderId').value = orderId;
+    loadOrderDetails(orderId);
+    // Langsung ke step metode pembayaran
+    currentStep = 2;
+    updateStepVisual(currentStep);
+    document.getElementById('paymentMethodSection').classList.remove('hidden');
+    document.getElementById('prevBtn').classList.remove('hidden');
+  } else {
+    // Jika tidak ada order_id, bisa redirect atau tampilkan pesan error
+    alert('Tidak ada pesanan yang dipilih!');
+    window.location.href = 'dashboard-customer.html';
+  }
+  loadPaymentHistory();
+  setupEventListeners();
+});
 
   function setupEventListeners() {
     // Order selection
-    document.getElementById('orderSelect').addEventListener('change', function () {
-      const orderId = this.value;
-      fetch(`${API_BASE_URL}/orders/${orderId}`)
-        .then(res => res.json())
-        .then(order => {
-          document.getElementById('billTotalPrice').textContent = `Rp${order.total_price.toLocaleString('id-ID')}`;
-          document.getElementById('orderTotalPrice').textContent = `Total: Rp${order.total_price.toLocaleString('id-ID')}`;
-        });
+    document.querySelectorAll('.payment-method').forEach(method => {
+    method.addEventListener('click', function () {
+      document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected', 'border-purple-500'));
+      this.classList.add('selected', 'border-purple-500');
+      document.getElementById('paymentMethod').value = this.dataset.method;
     });
+  });
+
+  // Full payment checkbox
+  document.getElementById('fullPayment').addEventListener('change', function () {
+    const total = parseInt(document.getElementById('billTotalPrice').textContent.replace(/[^\d]/g, ''));
+    document.getElementById('total_price').value = this.checked ? total : '';
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', nextStep);
+  document.getElementById('prevBtn').addEventListener('click', prevStep);
+
+  document.getElementById('paymentForm').addEventListener('submit', handlePaymentSubmit);
 
     // Payment method selection
     document.querySelectorAll('.payment-method').forEach(method => {
@@ -421,8 +433,6 @@
       // Reset form
       document.getElementById('paymentForm').reset();
       document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected', 'border-purple-500'));
-      document.getElementById('orderDetails').classList.add('hidden');
-      document.getElementById('orderSelect').value = '';
       document.getElementById('paymentMethod').value = '';
 
       currentStep = 1;

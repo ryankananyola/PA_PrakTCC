@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+import { API_BASE_URL } from './utils.js';
+
 const SESSION_TIMEOUT = 1000 * 60 * 30; // 30 menit
 
 document.addEventListener('DOMContentLoaded', () => {

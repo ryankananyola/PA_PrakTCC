@@ -4,20 +4,30 @@ import Order from "../models/orderModels.js";
 // CREATE payment
 export const createPayment = async (req, res) => {
     try {
-        const { order_id, method, total_price, status, payment_date } = req.body;
+        const { order_id, method, total_price } = req.body;
 
+        // 1. Simpan data pembayaran
         const payment = await Payment.create({
             order_id,
             method,
             total_price,
-            status,
-            payment_date,
+            status: true,
+            payment_date: new Date(),
         });
 
-        res.status(201).json({ msg: "Payment Created" });
+        // 2. Update status order jadi 'Processing' dan isPaid = true
+        await Order.update(
+            { status: "Processing", isPaid: true },
+            { where: { id: order_id } }
+        );
+
+        res.status(201).json({
+            status: "success",
+            message: "Pembayaran berhasil",
+            data: payment,
+        });
     } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ msg: "Error creating payment" });
+        res.status(500).json({ status: "error", message: error.message });
     }
 };
 
@@ -87,6 +97,7 @@ export const deletePayment = async (req, res) => {
         res.status(500).json({ msg: "Error deleting payment" });
     }
 };
+
 export const getPaymentsByOrderId = async (req, res) => {
     try {
         const payments = await Payment.findAll({

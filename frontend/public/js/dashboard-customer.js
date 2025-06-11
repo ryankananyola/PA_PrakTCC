@@ -1,5 +1,5 @@
+import { API_BASE_URL } from './utils.js';
 
-        const API_BASE_URL = 'http://localhost:3000/api';
         const ORDERS_PER_PAGE = 5;
         let currentPage = 1;
         let allOrders = [];
@@ -71,7 +71,7 @@
                               <div class="bg-white rounded-lg shadow-sm p-6 animate-fade-in flex items-center justify-between">
                                 <div>
                                     <p class="text-gray-500 text-sm font-semibold">Total Pesanan</p>
-                                    <h3 class="text-3xl font-bold text-blue-600">3</h3>
+                                    <h3 class="text-3xl font-bold text-blue-600" id="total-orders">0</h3>
                                 </div>
                                 <div class="p-3 rounded-full bg-blue-100 text-blue-600">
                                 <i class="fas fa-box-open fa-lg"></i>
@@ -215,30 +215,51 @@
             currentOrders.forEach(order => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50 transition-all duration-200';
+
+                // Tentukan status tampilan
+                let statusLabel = '';
+                let statusClass = '';
+                if (order.status === 'Pending') {
+                    statusLabel = 'Pending';
+                    statusClass = 'bg-yellow-100 text-yellow-800';
+                } else if (order.status === 'Processing') {
+                    statusLabel = 'Dalam Proses';
+                    statusClass = 'bg-blue-100 text-blue-800';
+                } else if (order.status === 'Done') {
+                    statusLabel = 'Selesai';
+                    statusClass = 'bg-green-100 text-green-800';
+                }
+
+                // Tentukan aksi tombol bayar
+                let payButtonHtml = '';
+                if (currentUserId === order.user.id) {
+                    if (order.isPaid) {
+                        // Sudah dibayar, tombol bayar disable/abu-abu
+                        payButtonHtml = `<span class="text-gray-400 cursor-not-allowed" title="Sudah Lunas"><i class="fas fa-credit-card"></i> Lunas</span>`;
+                    } else {
+                        // Belum dibayar, tombol bayar aktif
+                        payButtonHtml = `<button class="pay-btn text-purple-500 hover:text-purple-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Bayar">
+                                <i class="fas fa-credit-card"></i> Bayar
+                            </button>`;
+                    }
+                } else {
+                    payButtonHtml = `<span class="text-gray-400" title="Bukan pemilik"><i class="fas fa-credit-card"></i></span>`;
+                }
+
                 tr.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">${order.id}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.user ? order.user.name : 'Tidak ada data'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.weight ?? '0'} kg</td>
                     <td class="px-6 py-4 whitespace-nowrap">Rp${order.total_price?.toLocaleString('id-ID') ?? '0'}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-block px-2 py-1 text-xs font-semibold ${
-                            order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                            order.status === 'Processing' ? 'bg-blue-100 text-blue-800' :
-                            'bg-green-100 text-green-800'
-                        } rounded-full">
-                            ${order.status === 'Pending' ? 'Pending' :
-                            order.status === 'Processing' ? 'Dalam Proses' : 'Selesai'}
+                        <span class="inline-block px-2 py-1 text-xs font-semibold ${statusClass} rounded-full">
+                            ${statusLabel}
                         </span>
+                        ${order.isPaid ? '<span class="ml-2 text-green-600 font-semibold">Lunas</span>' : ''}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">${order.created_at ? new Date(order.created_at).toLocaleDateString('id-ID') : '-'}</td>
                     <td class="px-6 py-4 whitespace-nowrap flex space-x-2">
-                        
-                        ${currentUserId === order.user.id ? // Perbaikan: Gunakan order.user.id
-                            `<button class="pay-btn text-purple-500 hover:text-purple-700 transition-colors duration-200 focus:outline-none" data-id="${order.id}" title="Bayar">
-                                <i class="fas fa-credit-card"></i>
-                            </button>` :
-                            `<span class="text-gray-400" title="Bukan pemilik"><i class="fas fa-credit-card"></i></span>`
-                        }
+                        ${payButtonHtml}
                     </td>
                 `;
                 tbody.appendChild(tr);

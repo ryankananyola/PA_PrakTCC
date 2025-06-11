@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+import { API_BASE_URL } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Cek autentikasi admin
@@ -193,7 +193,7 @@ function displayPayments(payments) {
     row.innerHTML = `
       <td class="px-6 py-4 whitespace-nowrap">${payment.id}</td>
       <td class="px-6 py-4 whitespace-nowrap">${payment.order_id}</td>
-      <td class="px-6 py-4 whitespace-nowrap">Rp${(payment.amount ?? 0).toLocaleString('id-ID')}</td>
+      <td class="px-6 py-4 whitespace-nowrap">Rp${(payment.total_price ?? 0).toLocaleString('id-ID')}</td>
       <td class="px-6 py-4 whitespace-nowrap">${payment.status ? 'Lunas' : 'Pending'}</td>
       <td class="px-6 py-4 whitespace-nowrap">${new Date(payment.payment_date).toLocaleString("id-ID")}</td>
     `;
@@ -211,7 +211,7 @@ function updatePaymentStatistics(payments) {
   const completedPayments = payments.filter(p => p.status === true).length;
   const totalPaymentAmount = payments
     .filter(p => p.status === true)
-    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    .reduce((sum, p) => sum + Number(p.total_price || 0), 0);
 
   document.getElementById('total-payments').textContent = totalPayments;
   document.getElementById('pending-payments').textContent = pendingPayments;

@@ -116,7 +116,7 @@ Content-Type: application/json
 
 {
   "name": "RyanKanaNyola",
-  "email": "ayudya@gmail.com",
+  "email": "ayud@gmail.com",
   "password": "ryan123220198",
   "confirmPassword": "ryan123220198",
   "noHP": "081234567890",
@@ -197,4 +197,14 @@ Content-Type: application/json
 {
     "email": "user26@gmail.com",
     "password": "qwerty12"
+}
+
+
+###
+POST http://localhost:3000/api/users/login
+Content-Type: application/json
+
+{
+    "email": "ayudya@gmail.com",
+    "password": "rkn123220198"
 }

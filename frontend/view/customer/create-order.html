@@ -24,8 +24,8 @@
     <div id="error-alert" class="fixed top-4 right-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 hidden" role="alert"></div>
     <div id="success-alert" class="fixed top-4 right-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 hidden" role="alert"></div>
 
-    <script>
-        const API_BASE_URL = 'http://localhost:3000/api';
+    <script type="module">
+        import { API_BASE_URL } from '../../public/js/utils.js';
 
         document.addEventListener('DOMContentLoaded', function() {
             // Cek session user
