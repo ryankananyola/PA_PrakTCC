@@ -1,4 +1,11 @@
-runtime: python39
+runtime: nodejs20
+service: laundry-frontend
 handlers:
-  - url: /
-    static_dir: .
+  # Serve all static files with url ending with a file extension
+  - url: /(.*\..+)$
+    static_files: dist/\1
+    upload: dist/(.*\..+)$
+  # Catch all handler to index.html
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html
