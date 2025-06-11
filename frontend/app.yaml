@@ -1,4 +1,2 @@
-runtime: python39
-handlers:
-  - url: /
-    static_dir: .
+runtime: nodejs20
+service: laundryrr
