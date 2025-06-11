@@ -8,15 +8,16 @@ import {
     deletePayment,
     getPaymentsByOrderId
 } from "../controller/paymentController.js";
+import { verifyToken } from "../middleware/verifyToken.js"; // tambahkan ini
 
 const router = express.Router();
 
-router.get("/", getPayments);
-router.get("/:id", getPaymentById);
-router.get("/order/:orderId", getPaymentsByOrderId);
-router.post("/", createPayment);
-router.put("/:id", updatePayment);
-router.delete("/:id", deletePayment);
+router.get("/", verifyToken, getPayments);
+router.get("/:id", verifyToken, getPaymentById);
+router.get("/order/:orderId", verifyToken, getPaymentsByOrderId);
+router.post("/", verifyToken, createPayment);
+router.put("/:id", verifyToken, updatePayment);
+router.delete("/:id", verifyToken, deletePayment);
 
 
 export default router;
