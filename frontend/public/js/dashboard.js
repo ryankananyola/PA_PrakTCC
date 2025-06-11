@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const sessionData = localStorage.getItem('sessionData');
     
     if (!sessionData) {
-        // Jika belum login, redirect ke halaman login
-        window.location.href = '../view/login.html';
+        // Jika belum login, redirect ke dashboard.html
+        window.location.href = '../dashboard.html';
         return;
     }
     
@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('click', function(e) {
             if (e.target.id === 'logoutBtn') {
                 localStorage.removeItem('sessionData');
-                window.location.href = '../view/login.html';
+                window.location.href = '../dashboard.html';
             }
         });
     } catch (e) {
         console.error('Error parsing session data:', e);
         localStorage.removeItem('sessionData');
-        window.location.href = '../view/login.html';
+        window.location.href = '../dashboard.html';
     }
 });
 
