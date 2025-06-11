@@ -8,7 +8,13 @@ import paymentRoute from "./routes/paymentRoute.js";
 const app = express();
 
 const corsOptions = {
-  origin: ['https://laundryrr-dot-g-08-450802.uc.r.appspot.com', 'http://localhost:3000'],
+  origin: [
+    'https://g-08-450802.uc.r.appspot.com', // frontend App Engine
+    'https://laundryrr-dot-g-08-450802.uc.r.appspot.com', // jika ada FE lain
+    'http://localhost:3000', // untuk dev
+    'http://localhost:5500', // untuk dev
+    'http://127.0.0.1:5500'  // untuk dev
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
