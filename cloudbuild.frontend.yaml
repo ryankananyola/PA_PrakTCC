@@ -1,34 +1,4 @@
 steps:
-  # Step 1: Install dependencies
-  - name: "gcr.io/cloud-builders/npm"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        if [ ! -d "node_modules" ]; then
-          echo "Installing dependencies..."
-          npm ci
-        else
-          echo "Skipping npm install, node_modules exists."
-        fi
-    volumes:
-      - name: "npm-cache"
-        path: /root/.npm
-    dir: "frontend"
-
-  # Step 2: Build frontend
-  - name: "gcr.io/cloud-builders/npm"
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        npm run build
-    volumes:
-      - name: "npm-cache"
-        path: /root/.npm
-    dir: "frontend"
-
-  # Step 3: Deploy ke App Engine
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args: ["app", "deploy", "--quiet"]
