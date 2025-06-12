@@ -62,8 +62,12 @@ Semua endpoint di bagian ini **memerlukan autentikasi token (Protected Route)**.
 | DELETE | `/api/payments/:id`            | Menghapus pembayaran berdasarkan ID pembayaran.              |
 
 ### Contoh Request dan Response
-1. Register
-   ![](https://github.com/user-attachments/assets/ab1b99fd-bcea-4b0b-890d-9ef3d3dbaa59)
-   ![](https://github.com/user-attachments/assets/0e71ae72-bc1e-4357-97d9-bf8cc73618e4)
+#### Register
+![](https://github.com/user-attachments/assets/ab1b99fd-bcea-4b0b-890d-9ef3d3dbaa59)
+![](https://github.com/user-attachments/assets/0e71ae72-bc1e-4357-97d9-bf8cc73618e4)
 
-3. Login
+#### Login
+![](https://github.com/user-attachments/assets/6f074604-c948-4a72-bfa8-093dbb71e37d)
+![](https://github.com/user-attachments/assets/57e50f91-ac9e-4d50-87be-895c68eb195e)
+
+
