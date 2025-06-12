@@ -89,10 +89,9 @@ export const loginUser = async (req, res) => {
 
     if (!match) return res.status(401).json({ msg: "Password salah" });
 
-    const { id: userId, name, email, role } = user;
+    const { id: userId, name, role } = user;
 
     const accessToken = jwt.sign(
-      { id: userId, name, email, role },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "12h" }
     );
