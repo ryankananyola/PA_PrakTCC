@@ -174,7 +174,8 @@
                 const response = await fetch(`${API_BASE_URL}/orders`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authUser.token}`
                     },
                     body: JSON.stringify({
                         user_id: authUser.id,

@@ -270,7 +270,12 @@
 
   async function loadOrderDetails(orderId) {
     try {
-      const res = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+      const authUser = JSON.parse(localStorage.getItem('authUser'));
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+        headers: {
+          'Authorization': `Bearer ${authUser?.token || ''}`
+        }
+      });
       const { data: order } = await res.json();
 
       selectedOrder = order;
@@ -297,7 +302,11 @@
       const authUser = JSON.parse(localStorage.getItem('authUser'));
       if (!authUser) return;
 
-      const res = await fetch(`${API_BASE_URL}/payments/`);
+      const res = await fetch(`${API_BASE_URL}/payments/`, {
+        headers: {
+          'Authorization': `Bearer ${authUser.token}`
+        }
+      });
       const { data: payments } = await res.json();
       const tbody = document.getElementById('paymentHistory');
       tbody.innerHTML = '';
@@ -418,9 +427,13 @@
     };
 
     try {
+      const authUser = JSON.parse(localStorage.getItem('authUser'));
       const res = await fetch(`${API_BASE_URL}/payments/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authUser.token}`
+        },
         body: JSON.stringify(paymentData)
       });
 
