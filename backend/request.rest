@@ -115,10 +115,10 @@ POST https://laundry-198-325333151890.us-central1.run.app/api/users/register
 Content-Type: application/json
 
 {
-  "name": "RyanKanaNyola",
-  "email": "ayud@gmail.com",
-  "password": "ryan123220198",
-  "confirmPassword": "ryan123220198",
+  "name": "Contoh Register",
+  "email": "contoh@gmail.com",
+  "password": "contoh123220198",
+  "confirmPassword": "contoh123220198",
   "noHP": "081234567890",
   "role": "admin"
 }
@@ -175,8 +175,8 @@ POST https://laundry-198-325333151890.us-central1.run.app/api/users/login
 Content-Type: application/json
 
 {
-    "email": "ayud@gmail.com",
-    "password": "ryan123220198"
+    "email": "contoh@gmail.com",
+    "password": "contoh123220198"
 }
 
 ###
@@ -211,3 +211,6 @@ Content-Type: application/json
     "email": "ayudya@gmail.com",
     "password": "rkn123220198"
 }
+
+###
+GET https://laundry-198-325333151890.us-central1.run.app/api/users

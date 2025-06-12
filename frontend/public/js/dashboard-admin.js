@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Ambil token dari localStorage sekali saja
+function getToken() {
+    const authUser = JSON.parse(localStorage.getItem('authUser'));
+    return authUser?.token || '';
+}
+
 // Fungsi untuk cek autentikasi admin
 function checkAuth() {
     const authUser = JSON.parse(localStorage.getItem('authUser'));
@@ -36,8 +42,6 @@ function checkAuth() {
         window.location.href = '../login.html'; // Sesuaikan path jika perlu
         return;
     }
-
-    // Tampilkan nama admin di sidebar
     document.getElementById('admin-name').textContent = authUser.name;
     document.getElementById('admin-email').textContent = authUser.email;
 }
@@ -47,7 +51,12 @@ async function loadOrders() {
     try {
         showLoading('order-loading', true);
 
-        const response = await fetch(`${API_BASE_URL}/orders`);
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Gagal memuat data pesanan');
         }
@@ -134,7 +143,6 @@ function displayOrders(orders) {
     tbody.innerHTML = rows;
 }
 
-
 // Fungsi untuk memperbarui statistik pesanan
 function updateOrderStatistics(orders) {
     const totalOrders = orders.length;
@@ -152,17 +160,20 @@ function updateOrderStatistics(orders) {
     document.getElementById('total-revenue').textContent = `Rp${totalRevenue.toLocaleString('id-ID')}`;
 }
 
-
 // Fungsi untuk memuat data pembayaran
 async function loadPayments() {
     try {
-        const response = await fetch(`${API_BASE_URL}/payments`);
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/payments`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const data = await response.json();
         console.log("RESPON API:", data);
 
-        // data langsung berupa array
         if (Array.isArray(data)) {
-            displayPayments(data);  // langsung kirim array ke displayPayments
+            displayPayments(data);
         } else {
             console.error("Format data pembayaran tidak sesuai:", data);
         }
@@ -170,8 +181,6 @@ async function loadPayments() {
         console.error("Error saat memuat pembayaran:", error);
     }
 }
-
-
 
 // Fungsi untuk menampilkan data pembayaran di tabel
 function displayPayments(payments) {
@@ -202,8 +211,6 @@ function displayPayments(payments) {
   });
 }
 
-
-
 // Fungsi untuk memperbarui statistik pembayaran
 function updatePaymentStatistics(payments) {
   const totalPayments = payments.length;
@@ -219,15 +226,17 @@ function updatePaymentStatistics(payments) {
   document.getElementById('total-payment-amount').textContent = `Rp${totalPaymentAmount.toLocaleString('id-ID')}`;
 }
 
-
-
-
 // Fungsi untuk edit order
 async function editOrder(orderId) {
     try {
         showLoading('edit-modal-loading', true);
 
-        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Gagal mengambil data pesanan');
         }
@@ -271,10 +280,12 @@ async function handleEditOrder(e) {
     try {
         showLoading('edit-modal-loading', true);
 
+        const token = getToken();
         const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 weight: parseFloat(weight),
@@ -317,8 +328,12 @@ async function deleteOrder(orderId) {
     try {
         showLoading('order-loading', true);
 
+        const token = getToken();
         const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         if (!response.ok) {

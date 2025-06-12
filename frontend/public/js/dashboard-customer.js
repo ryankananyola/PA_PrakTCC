@@ -396,3 +396,30 @@ import { API_BASE_URL } from './utils.js';
                 successAlert.classList.add('hidden');
             }, 3000);
         }
+
+        function getToken() {
+            const authUser = JSON.parse(localStorage.getItem('authUser'));
+            return authUser?.token || '';
+        }
+
+        async function loadPayments() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/payments`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Gagal memuat data pembayaran');
+                }
+                const data = await response.json();
+                // TODO: render data payments di sini, misal: renderPayments(data.data);
+                console.log('Data payments:', data);
+            } catch (error) {
+                showError('order-error', error.message);
+            }
+        }
+
+        // Panggil loadPayments() jika ingin menampilkan data pembayaran customer
+        // Contoh: loadPayments(); setelah renderDashboard atau sesuai kebutuhan

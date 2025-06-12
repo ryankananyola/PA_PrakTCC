@@ -230,7 +230,15 @@
             try {
                 showLoading('order-loading', true);
 
-                const response = await fetch(`${API_BASE_URL}/orders`);
+                const authUser = JSON.parse(localStorage.getItem('authUser'));
+                const token = authUser?.token;
+
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error('Gagal memuat data pesanan');
                 }
@@ -339,13 +347,19 @@
         // Fungsi untuk memuat data pembayaran
         async function loadPayments() {
             try {
-                const response = await fetch(`${API_BASE_URL}/payments`);
+                const authUser = JSON.parse(localStorage.getItem('authUser'));
+                const token = authUser?.token; // Pastikan token tersimpan di authUser
+
+                const response = await fetch(`${API_BASE_URL}/payments`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const data = await response.json();
                 console.log("RESPON API:", data);
 
-                // data langsung berupa array
                 if (Array.isArray(data)) {
-                    displayPayments(data);  // langsung kirim array ke displayPayments
+                    displayPayments(data);
                 } else {
                     console.error("Format data pembayaran tidak sesuai:", data);
                 }

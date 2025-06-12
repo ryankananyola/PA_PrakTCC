@@ -11,7 +11,6 @@ import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-// Ganti endpoint ini untuk konsistensi
 router.get("/", verifyToken, getOrders);
 router.get("/:id", verifyToken, getOrderById);
 router.post("/", verifyToken, createOrder);
