@@ -31,12 +31,12 @@ Aplikasi Laundry berbasis Node.js + Express untuk Backend Service, dengan fitur 
 | DELETE | `/api/auth/logout`  | Logout pengguna dan menghapus refresh token dari server.               |
 #### Contoh Request dan Response Register
 1. Request
-POST http://localhost:3000/api/users/register
-Content-Type: application/json
-![image](https://github.com/user-attachments/assets/6fb23fee-ab3f-4be5-8f25-301ea89fbfe3)
+   POST http://localhost:3000/api/users/register
+   Content-Type: application/json
+   ![image](https://github.com/user-attachments/assets/6fb23fee-ab3f-4be5-8f25-301ea89fbfe3)
 
-2. Response
-![image](https://github.com/user-attachments/assets/832a4842-74ea-42cf-b1d0-3b969739412f)
+3. Response
+   ![image](https://github.com/user-attachments/assets/832a4842-74ea-42cf-b1d0-3b969739412f)
 
 
 
