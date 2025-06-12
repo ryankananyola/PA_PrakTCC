@@ -34,6 +34,10 @@ export const createPayment = async (req, res) => {
 // GET all payments
 export const getPayments = async (req, res) => {
     try {
+        // Cek role admin
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ status: "error", message: "Akses hanya untuk admin" });
+        }
         const payments = await Payment.findAll();
         res.status(200).json(payments);
     } catch (error) {
