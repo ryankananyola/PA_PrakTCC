@@ -1,8 +1,26 @@
 # LAUNDRY RR
 ## 📝 Deskripsi Tema Proyek
-blabla
+Aplikasi Laundry berbasis Node.js + Express untuk Backend Service, dengan fitur manajemen pengguna, autentikasi JWT, pesanan, dan pembayaran.
+
 ## 🚀 Fitur Utama
+- 🔑 Autentikasi dengan JWT Token (Login, Register, Refresh Token, Logout)
+- 👤 Manajemen Pengguna (CRUD) [Protected]
+- 🧺 Manajemen Pesanan Laundry (CRUD) [Protected]
+- 💳 Manajemen Pembayaran Laundry (CRUD) [Protected]
+
 ## 🛠️ Teknologi Yang Digunakan
+1. Backend
+   - Runtime: Node.js
+   - Framework: MySQL
+   - Database: Sequelize
+   - Authentication: JWT (JSON Web Token)
+   - Password Hashing: bcrypt
+   - Development Tools: nodemon
+3. Frontend
+   - HTML
+   - CSS
+   - Java Script
+
 ## 🔑 Endpoint API
 ### Autentikasi
 | Method | Endpoint            | Deskripsi                                                              |
