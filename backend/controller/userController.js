@@ -34,7 +34,7 @@ export const registerUser = async (req, res) => {
     // Kalau admin, buat refresh token dan simpan ke DB + cookie
     if (newUser.role === "admin") {
       const refreshToken = jwt.sign(
-        { userId: newUser.id, email: newUser.email, role: newUser.role },
+        { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
@@ -89,15 +89,15 @@ export const loginUser = async (req, res) => {
 
     if (!match) return res.status(401).json({ msg: "Password salah" });
 
-    const { id: userId, name, role } = user;
+    const { id, name, email, role } = user;
 
     const accessToken = jwt.sign(
-      { userId, name, email, role },
+      { id, name, email, role },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "20s" }
+      { expiresIn: "12h" }
     );
     const refreshToken = jwt.sign(
-      { userId, name, email, role },
+      { id, name, email, role },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );

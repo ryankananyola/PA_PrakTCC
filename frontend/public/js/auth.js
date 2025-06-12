@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('sessionData', sessionPayload);
                 }
 
-                handleSuccessfulLogin(result.data);
+                // Simpan accessToken ke localStorage (authUser)
+                handleSuccessfulLogin(result.data, result.accessToken);
 
             } catch (err) {
                 showError(err.message || 'Terjadi kesalahan saat login', errorMsg);
@@ -156,7 +157,7 @@ function redirectBasedOnRole(role) {
 
 
 
-function handleSuccessfulLogin(userData) {
+function handleSuccessfulLogin(userData, accessToken) {
     console.log('Login sukses, user data:', userData); 
 
     localStorage.setItem('authUser', JSON.stringify({
@@ -164,7 +165,8 @@ function handleSuccessfulLogin(userData) {
         name: userData.name,
         email: userData.email,
         phone: userData.noHP || userData.phone,
-        role: userData.role
+        role: userData.role,
+        token: accessToken // <-- simpan token di sini
     }));
 
     redirectBasedOnRole(userData.role);

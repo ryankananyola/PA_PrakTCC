@@ -50,26 +50,25 @@ function checkAuth() {
 async function loadOrders() {
     try {
         showLoading('order-loading', true);
-
         const token = getToken();
         const response = await fetch(`${API_BASE_URL}/orders`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-        if (!response.ok) {
-            throw new Error('Gagal memuat data pesanan');
-        }
-
         const data = await response.json();
-
+        if (
+            response.status === 401 || response.status === 403 ||
+            (data.status === 'error' && data.message && data.message.toLowerCase().includes('token'))
+        ) {
+            showError('order-error', 'Sesi Anda telah berakhir. Silakan login ulang.');
+            return;
+        }
         if (data.status !== "success") {
             throw new Error(data.message || 'Gagal memuat data pesanan');
         }
-
         displayOrders(data.data);
         updateOrderStatistics(data.data);
-
     } catch (error) {
         showError('order-error', error.message);
     } finally {
@@ -170,15 +169,22 @@ async function loadPayments() {
             }
         });
         const data = await response.json();
-        console.log("RESPON API:", data);
-
+        if (
+            response.status === 401 || response.status === 403 ||
+            (data.status === 'error' && data.message && data.message.toLowerCase().includes('token'))
+        ) {
+            showError('payment-error', 'Sesi Anda telah berakhir. Silakan login ulang.');
+            return;
+        }
         if (Array.isArray(data)) {
             displayPayments(data);
+        } else if (Array.isArray(data.data)) {
+            displayPayments(data.data);
         } else {
-            console.error("Format data pembayaran tidak sesuai:", data);
+            showError('payment-error', data.message || 'Format data pembayaran tidak sesuai');
         }
     } catch (error) {
-        console.error("Error saat memuat pembayaran:", error);
+        showError('payment-error', error.message);
     }
 }
 
