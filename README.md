@@ -29,6 +29,32 @@ Aplikasi Laundry berbasis Node.js + Express untuk Backend Service, dengan fitur 
 | POST   | `/api/auth/register`| Registrasi pengguna baru.                                              |
 | GET    | `/api/auth/token`   | Refresh token untuk mendapatkan access token baru.                     |
 | DELETE | `/api/auth/logout`  | Logout pengguna dan menghapus refresh token dari server.               |
+#### Contoh Request dan Response Register
+1. Request
+POST http://localhost:3000/api/users/register
+Content-Type: application/json
+
+{
+  "name": "Contoh Register",
+  "email": "contoh@gmail.com",
+  "password": "contoh123220198",
+  "confirmPassword": "contoh123220198",
+  "noHP": "081234567890",
+  "role": "admin"
+}
+
+2. Response
+{
+  "msg": "Registrasi berhasil",
+  "user": {
+    "id": 1,
+    "name": "Contoh Register",
+    "email": "contoh@gmail.com",
+    "noHP": "081234567890",
+    "role": "admin"
+  }
+}
+
 
 ### Users Management
 Semua endpoint di bagian ini **memerlukan autentikasi (Protected Route)**.
