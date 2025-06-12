@@ -91,7 +91,9 @@ export const loginUser = async (req, res) => {
 
     const { id: userId, name, role } = user;
 
+    // FIX: JWT payload dan secret harus benar urutannya
     const accessToken = jwt.sign(
+      { id: userId, name, email, role },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "12h" }
     );
