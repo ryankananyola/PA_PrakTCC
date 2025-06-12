@@ -22,11 +22,14 @@ export const registerUser = async (req, res) => {
       return res.status(409).json({ msg: "Email sudah terdaftar" });
     }
 
-    // Password tidak perlu di-hash di sini, biarkan model yang handle
+    // Hash password sebelum simpan user baru
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const newUser = await User.create({
       name,
       email,
-      password,  // langsung plain password
+      password: hashedPassword, // simpan hash, bukan plain
       noHP,
       role: role || "customer",
     });
