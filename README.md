@@ -1,8 +1,26 @@
 # LAUNDRY RR
 ## 📝 Deskripsi Tema Proyek
-blabla
+Aplikasi Laundry berbasis Node.js + Express untuk Backend Service, dengan fitur manajemen pengguna, autentikasi JWT, pesanan, dan pembayaran.
+
 ## 🚀 Fitur Utama
+- 🔑 Autentikasi dengan JWT Token (Login, Register, Refresh Token, Logout)
+- 👤 Manajemen Pengguna (CRUD) [Protected]
+- 🧺 Manajemen Pesanan Laundry (CRUD) [Protected]
+- 💳 Manajemen Pembayaran Laundry (CRUD) [Protected]
+
 ## 🛠️ Teknologi Yang Digunakan
+1. Backend
+   - Runtime: Node.js
+   - Framework: MySQL
+   - Database: Sequelize
+   - Authentication: JWT (JSON Web Token)
+   - Password Hashing: bcrypt
+   - Development Tools: nodemon
+3. Frontend
+   - HTML
+   - CSS
+   - Java Script
+
 ## 🔑 Endpoint API
 ### Autentikasi
 | Method | Endpoint            | Deskripsi                                                              |
@@ -13,6 +31,7 @@ blabla
 | DELETE | `/api/auth/logout`  | Logout pengguna dan menghapus refresh token dari server.               |
 
 ### Users Management
+Semua endpoint di bagian ini **memerlukan autentikasi (Protected Route)**.
 | Method | Endpoint         | Deskripsi                                              |
 |--------|------------------|-------------------------------------------------------|
 | GET    | `/api/users/`    | Mendapatkan daftar seluruh pengguna (Protected)       |
@@ -20,4 +39,35 @@ blabla
 | POST   | `/api/users/`    | Menambahkan pengguna baru (Protected)                 |
 | PUT    | `/api/users/:id` | Mengupdate data pengguna berdasarkan ID (Protected)   |
 | DELETE | `/api/users/:id` | Menghapus pengguna berdasarkan ID (Protected)         |
+
+### Order Management
+Semua endpoint di bagian ini **memerlukan autentikasi (Protected Route)**.
+| Method | Endpoint           | Deskripsi                                |
+|--------|--------------------|------------------------------------------|
+| GET    | `/api/orders/`     | Mendapatkan daftar semua pesanan.       |
+| GET    | `/api/orders/:id`  | Mendapatkan detail pesanan berdasarkan ID. |
+| POST   | `/api/orders/`     | Membuat pesanan baru.                   |
+| PUT    | `/api/orders/:id`  | Mengupdate data pesanan berdasarkan ID. |
+| DELETE | `/api/orders/:id`  | Menghapus pesanan berdasarkan ID.       |
+
+### Payments Management
+Semua endpoint di bagian ini **memerlukan autentikasi token (Protected Route)**.
+| Method | Endpoint                       | Deskripsi                                                     |
+|--------|--------------------------------|--------------------------------------------------------------|
+| GET    | `/api/payments/`               | Mendapatkan daftar semua pembayaran.                         |
+| GET    | `/api/payments/:id`            | Mendapatkan detail pembayaran berdasarkan ID pembayaran.     |
+| GET    | `/api/payments/order/:orderId` | Mendapatkan pembayaran berdasarkan ID pesanan terkait.       |
+| POST   | `/api/payments/`               | Membuat data pembayaran baru.                                |
+| PUT    | `/api/payments/:id`            | Mengupdate data pembayaran berdasarkan ID pembayaran.        |
+| DELETE | `/api/payments/:id`            | Menghapus pembayaran berdasarkan ID pembayaran.              |
+
+### Contoh Request dan Response
+#### Register
+![](https://github.com/user-attachments/assets/ab1b99fd-bcea-4b0b-890d-9ef3d3dbaa59)
+![](https://github.com/user-attachments/assets/0e71ae72-bc1e-4357-97d9-bf8cc73618e4)
+
+#### Login
+![](https://github.com/user-attachments/assets/6f074604-c948-4a72-bfa8-093dbb71e37d)
+![](https://github.com/user-attachments/assets/57e50f91-ac9e-4d50-87be-895c68eb195e)
+
 
