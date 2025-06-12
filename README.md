@@ -63,7 +63,7 @@ Semua endpoint di bagian ini **memerlukan autentikasi token (Protected Route)**.
 
 ### Contoh Request dan Response
 1. Register
-   ![image](https://github.com/user-attachments/assets/ab1b99fd-bcea-4b0b-890d-9ef3d3dbaa59)
-   ![image](https://github.com/user-attachments/assets/0e71ae72-bc1e-4357-97d9-bf8cc73618e4)
+   ![](https://github.com/user-attachments/assets/ab1b99fd-bcea-4b0b-890d-9ef3d3dbaa59)
+   ![](https://github.com/user-attachments/assets/0e71ae72-bc1e-4357-97d9-bf8cc73618e4)
 
 3. Login
