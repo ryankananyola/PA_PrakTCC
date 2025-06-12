@@ -22,14 +22,11 @@ export const registerUser = async (req, res) => {
       return res.status(409).json({ msg: "Email sudah terdaftar" });
     }
 
-    // Hash password sebelum simpan user baru
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
+    // Password tidak perlu di-hash di sini, biarkan model yang handle
     const newUser = await User.create({
       name,
       email,
-      password: hashedPassword, // simpan hash, bukan plain
+      password,  // langsung plain password
       noHP,
       role: role || "customer",
     });
@@ -37,7 +34,7 @@ export const registerUser = async (req, res) => {
     // Kalau admin, buat refresh token dan simpan ke DB + cookie
     if (newUser.role === "admin") {
       const refreshToken = jwt.sign(
-        { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role },
+        { userId: newUser.id, email: newUser.email, role: newUser.role },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "1d" }
       );
@@ -92,14 +89,14 @@ export const loginUser = async (req, res) => {
 
     if (!match) return res.status(401).json({ msg: "Password salah" });
 
-    const { id, name, email, role } = user;
+    const { id: userId, name, role } = user;
 
     const accessToken = jwt.sign(
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "12h" }
     );
     const refreshToken = jwt.sign(
-      { id, name, email, role },
+      { userId, name, email, role },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
