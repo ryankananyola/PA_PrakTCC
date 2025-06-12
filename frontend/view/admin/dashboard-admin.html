@@ -180,7 +180,7 @@
     </div>
 
     <script type="module">
-        import { API_BASE_URL } from '../../public/js/utils.js';
+        import { API_BASE_URL, getToken } from '../../public/js/utils.js';
 
         document.addEventListener('DOMContentLoaded', function() {
             // Cek autentikasi admin
@@ -230,14 +230,17 @@
             try {
                 showLoading('order-loading', true);
 
-                const authUser = JSON.parse(localStorage.getItem('authUser'));
-                const token = authUser?.token;
-
+                const token = getToken();
                 const response = await fetch(`${API_BASE_URL}/orders`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error('Gagal memuat data pesanan');
@@ -347,14 +350,18 @@
         // Fungsi untuk memuat data pembayaran
         async function loadPayments() {
             try {
-                const authUser = JSON.parse(localStorage.getItem('authUser'));
-                const token = authUser?.token; // Pastikan token tersimpan di authUser
-
+                const token = getToken();
                 const response = await fetch(`${API_BASE_URL}/payments`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
                 const data = await response.json();
                 console.log("RESPON API:", data);
 
@@ -421,7 +428,18 @@
             try {
                 showLoading('edit-modal-loading', true);
 
-                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`);
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error('Gagal mengambil data pesanan');
                 }
@@ -465,10 +483,12 @@
             try {
                 showLoading('edit-modal-loading', true);
 
+                const token = getToken();
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         weight: parseFloat(weight),
@@ -476,6 +496,11 @@
                         status
                     })
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error('Gagal memperbarui pesanan');
@@ -512,9 +537,18 @@
             try {
                 showLoading('order-loading', true);
 
+                const token = getToken();
                 const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
+
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error('Gagal menghapus pesanan');

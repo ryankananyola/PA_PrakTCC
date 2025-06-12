@@ -124,6 +124,15 @@ Content-Type: application/json
 }
 
 ###
+POST https://laundry-198-325333151890.us-central1.run.app/api/users/login
+Content-Type: application/json
+
+{
+    "email": "contoh@gmail.com",
+    "password": "contoh123220198"
+}
+
+###
 POST http://localhost:3000/api/users/register
 Content-Type: application/json
 

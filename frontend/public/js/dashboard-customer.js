@@ -1,4 +1,4 @@
-import { API_BASE_URL } from './utils.js';
+import { API_BASE_URL, getToken } from './utils.js';
 
         const ORDERS_PER_PAGE = 5;
         let currentPage = 1;
@@ -165,27 +165,31 @@ import { API_BASE_URL } from './utils.js';
         async function loadOrders() {
             try {
                 showLoading('order-loading', true);
-
-                const response = await fetch(`${API_BASE_URL}/orders`);
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error('Gagal memuat data pesanan');
                 }
-
                 const data = await response.json();
-
                 if (data.status !== "success") {
                     throw new Error(data.message || 'Gagal memuat data pesanan');
                 }
-
                 allOrders = data.data; // Simpan semua order untuk pencarian dan paginasi
                 renderOrderTable(allOrders, currentPage);
                 updateOrderStatistics(allOrders);
-
             } catch (error) {
                 showError('order-error', error.message);
             } finally {
                 showLoading('order-loading', false);
-                document.getElementById('loader-initial').classList.add('hidden'); // Sembunyikan loader awal
+                document.getElementById('loader-initial')?.classList.add('hidden'); // Sembunyikan loader awal
             }
         }
 
@@ -397,11 +401,6 @@ import { API_BASE_URL } from './utils.js';
             }, 3000);
         }
 
-        function getToken() {
-            const authUser = JSON.parse(localStorage.getItem('authUser'));
-            return authUser?.token || '';
-        }
-
         async function loadPayments() {
             try {
                 const token = getToken();
@@ -410,6 +409,10 @@ import { API_BASE_URL } from './utils.js';
                         'Authorization': `Bearer ${token}`
                     }
                 });
+                if (response.status === 401 || response.status === 403) {
+                    logout();
+                    return;
+                }
                 if (!response.ok) {
                     throw new Error('Gagal memuat data pembayaran');
                 }
