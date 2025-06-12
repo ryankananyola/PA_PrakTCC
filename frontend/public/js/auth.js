@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('sessionData', sessionPayload);
                 }
 
-                // Simpan accessToken ke localStorage (authUser)
                 handleSuccessfulLogin(result.data, result.accessToken);
 
             } catch (err) {
