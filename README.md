@@ -33,27 +33,12 @@ Aplikasi Laundry berbasis Node.js + Express untuk Backend Service, dengan fitur 
 1. Request
 POST http://localhost:3000/api/users/register
 Content-Type: application/json
-
-{
-  "name": "Contoh Register",
-  "email": "contoh@gmail.com",
-  "password": "contoh123220198",
-  "confirmPassword": "contoh123220198",
-  "noHP": "081234567890",
-  "role": "admin"
-}
+![image](https://github.com/user-attachments/assets/6fb23fee-ab3f-4be5-8f25-301ea89fbfe3)
 
 2. Response
-{
-  "msg": "Registrasi berhasil",
-  "user": {
-    "id": 1,
-    "name": "Contoh Register",
-    "email": "contoh@gmail.com",
-    "noHP": "081234567890",
-    "role": "admin"
-  }
-}
+![image](https://github.com/user-attachments/assets/832a4842-74ea-42cf-b1d0-3b969739412f)
+
+
 
 
 ### Users Management
